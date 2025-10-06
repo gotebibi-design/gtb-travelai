@@ -827,6 +827,35 @@
         function generateAIResponse(userMessage) {
             const message = userMessage.toLowerCase();
             
+            // РАЗПОЗНАВАНЕ НА ПОЛЕТИ СОФИЯ-РИМ
+            if ((message.includes('софия') && message.includes('рим')) || 
+                (message.includes('sofia') && message.includes('rome')) ||
+                (message.includes('полет') && message.includes('рим'))) {
+                
+                return `✈️ <strong>Полети София → Рим:</strong><br><br>
+📅 <strong>Дати:</strong> 23-27 ноември 2025 (4 нощувки)<br>
+👥 <strong>Пътници:</strong> 2 възрастни<br><br>
+
+🔍 <strong>Проверка на полети:</strong><br>
+1. 🎫 Търся директни полети SOF → FCO<br>
+2. 💰 Сравнявам цени между авиокомпании<br>
+3. ⏰ Проверявам времеви разписания<br><br>
+
+🏛️ <strong>За Рим препоръчвам:</strong><br>
+• Директни полети с Wizz Air и Ryanair<br>
+• Резервация 2-3 месеца предварително<br>
+• Проверка на багажните allowances<br><br>
+
+🔗 <strong>Директна проверка:</strong><br>
+• <a href="https://www.google.com/travel/flights" target="_blank">Google Flights</a><br>
+• <a href="https://wizzair.com" target="_blank">Wizz Air</a><br>
+• <a href="https://www.ryanair.com" target="_blank">Ryanair</a><br><br>
+
+📞 <strong>За помощ с резервация:</strong><br>
+Биляна: +359 885 07 89 80<br>
+<em>Можем да намерим най-добрата оферта за вас!</em>`;
+            }
+            
             // Разпознаване на конкретни заявки за стаи и дати
             if ((message.includes('октомври') && message.includes('2025')) || 
                 (message.includes('стати') && message.includes('делукс')) ||
