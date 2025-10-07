@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GTB TravelAI | Професионален Пътнически Консултант</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        /* ЦЯЛАТА CSS ЧАСТ ОСТАВА СЪЩАТА */
+        :root {
+            --ocean-blue: #1e40af;
+            --sand-beige: #fef3c7;
+            --sunset-orange: #f59e0b;
+            --forest-green: #059669;
+            --sky-blue: #38bdf8;
+            --deep-blue: #1e3a8a;
+            --warm-white: #fffbeb;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, var(--sky-blue) 0%, var(--ocean-blue) 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+            border-bottom: 3px solid var(--sunset-orange);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--ocean-blue);
+        }
+        
+        .language-switcher {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .lang-btn {
+            padding: 8px 12px;
+            border: 2px solid transparent;
+            background: var(--warm-white);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .lang-btn.active {
+            border-color: var(--sunset-orange);
+            background: var(--sunset-orange);
+            color: white;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.9) 0%, rgba(59, 130, 246, 0.8) 100%);
+            border-radius: 25px;
+            padding: 140px 40px 80px;
+            margin-top: 80px;
+            text-align: center;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 18px 35px;
+            background: var(--sunset-orange);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .ai-interface {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 50px 0;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+        }
+        
+        .chat-container {
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 25px;
+            max-height: 500px;
+            overflow-y: auto;
+            background: var(--warm-white);
+            margin-bottom: 20px;
+        }
+        
+        .message {
+            margin: 18px 0;
+            padding: 15px 20px;
+            border-radius: 20px;
+            max-width: 85%;
+        }
+        
+        .user-message {
+            background: linear-gradient(135deg, var(--ocean-blue), var(--sky-blue));
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .ai-message {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 5px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .quick-btn {
+            background: white;
+            border: 2px solid var(--ocean-blue);
+            color: var(--ocean-blue);
+            padding: 12px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .quick-btn:hover {
+            background: var(--ocean-blue);
+            color: white;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 1rem;
+        }
+        
+        .chat-input button {
+            padding: 18px 30px;
+            background: var(--forest-green);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        #travel-map {
+            height: 500px;
+            border-radius: 15px;
+            border: 3px solid var(--sky-blue);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <div class="logo">GTB TravelAI</div>
+            <div class="language-switcher">
+                <button class="lang-btn active">🇧🇬 БГ</button>
+                <button class="lang-btn">🇬🇧 EN</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="hero">
+            <h1>Професионални Пътнически Решения</h1>
+            <p>Вашият интелигентен партньор за световни пътешествия</p>
+            <a href="#ai-chat" class="cta-button">🎯 Започнете приключението</a>
+        </section>
+
+        <section id="ai-chat" class="ai-interface">
+            <h2>AI Travel Консултант</h2>
+            
+            <div class="chat-container" id="chat-messages">
+                <div class="message ai-message">
+                    <strong>Добър ден! Аз съм вашият AI travel консултант. ✈️</strong><br><br>
+                    🎯 <strong>Мога да ви асистирам с:</strong><br>
+                    • Препоръки за полети и хотели<br>
+                    • Сравнение на цени<br>
+                    • Пътни маршрути<br>
+                    • Бизнес пътувания<br><br>
+                    <em>С какво мога да ви бъда полезен днес?</em>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="quick-btn" data-action="flights">✈️ Търсене на полети</button>
+                <button class="quick-btn" data-action="hotels">🏨 Хотели и настаняване</button>
+                <button class="quick-btn" data-action="packages">🧳 Пакетни оферти</button>
+                <button class="quick-btn" data-action="business">💼 Бизнес пътувания</button>
+            </div>
+
+            <div class="chat-input">
+                <input type="text" id="user-input" placeholder="Опишете вашето пътуване...">
+                <button id="send-btn">📨 Изпрати</button>
+            </div>
+        </section>
+
+        <section class="map-section">
+            <h2>Световни Дестинации</h2>
+            <div id="travel-map"></div>
+        </section>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // ==================== ОСНОВНИ ФУНКЦИИ ====================
+        
+        // Функция за добавяне на съобщение
+        function addMessage(text, type = 'ai') {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            messageDiv.innerHTML = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Функция за генериране на отговор
+        function generateAIResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+            
+            if (lowerMessage.includes('софия') && lowerMessage.includes('париж')) {
+                return `✈️ <strong>Открих опции за София-Париж!</strong><br><br>
+                🎯 <strong>Препоръки:</strong><br>
+                • <strong>Wizz Air</strong>: от €89 ид-назад<br>
+                • <strong>Air France</strong>: от €215 ид-назад<br>
+                • <strong>Lufthansa</strong>: от €198 през Мюнхен`;
+            }
+            
+            if (lowerMessage.includes('софия') && lowerMessage.includes('рим')) {
+                return `✈️ <strong>Открих опции за София-Рим!</strong><br><br>
+                🎯 <strong>Препоръки:</strong><br>
+                • <strong>Ryanair</strong>: от €67 ид-набав<br>
+                • <strong>Bulgaria Air</strong>: от €185 ид-назад<br>
+                • <strong>Wizz Air</strong>: от €79 ид-назад`;
+            }
+
+            if (lowerMessage.includes('хотел')) {
+                return `🏨 <strong>Отлично! Да намерим перфектния хотел!</strong><br><br>
+                📚 <strong>Проверяваме:</strong><br>
+                1. <strong>Booking.com</strong><br>
+                2. <strong>Hotels.com</strong><br>
+                3. <strong>Expedia</strong>`;
+            }
+
+            return `🤖 <strong>Разбирам, че искате: "${userMessage}"</strong><br><br>
+            🎯 <strong>Ще ви подготвя персонализирани оферти!</strong>`;
+        }
+
+        // Функция за изпращане на съобщение
+        function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const message = userInput.value.trim();
+            
+            if (message === '') return;
+            
+            addMessage(message, 'user');
+            userInput.value = '';
+            
+            setTimeout(() => {
+                const aiResponse = generateAIResponse(message);
+                addMessage(aiResponse, 'ai');
+            }, 1000);
+        }
+
+        // Функция за бързи действия
+        function handleQuickAction(action) {
+            let message = '';
+            
+            switch(action) {
+                case 'flights':
+                    message = 'Търся полети. Моля, уточнете дестинация и дати.';
+                    break;
+                case 'hotels':
+                    message = 'Търся хотели. Моля, уточнете дестинация, дати и брой гости.';
+                    break;
+                case 'packages':
+                    message = 'Търся пакетни оферти. Моля, уточнете дестинация и период.';
+                    break;
+                case 'business':
+                    message = 'Търся бизнес пътувания. Моля, уточнете изисквания.';
+                    break;
+            }
+            
+            document.getElementById('user-input').value = message;
+            sendMessage();
+        }
+
+        // Инициализация на картата
+        function initMap() {
+            const map = L.map('travel-map').setView([42.6977, 23.3219], 3);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            // Маркери
+            const destinations = [
+                { name: "София", coords: [42.6977, 23.3219] },
+                { name: "Париж", coords: [48.8566, 2.3522] },
+                { name: "Рим", coords: [41.9028, 12.4964] },
+                { name: "Истанбул", coords: [41.0082, 28.9784] }
+            ];
+
+            destinations.forEach(dest => {
+                const marker = L.marker(dest.coords).addTo(map);
+                marker.bindPopup(`<strong>${dest.name}</strong>`);
+            });
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Страницата е заредена!');
+            
+            // Инициализиране на картата
+            initMap();
+            
+            // Бутон за изпращане
+            const sendBtn = document.getElementById('send-btn');
+            if (sendBtn) {
+                sendBtn.addEventListener('click', sendMessage);
+                console.log('✅ Send button attached');
+            }
+            
+            // Enter клавиш
+            const userInput = document.getElementById('user-input');
+            if (userInput) {
+                userInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+                console.log('✅ Enter key attached');
+            }
+            
+            // Бързи бутони
+            const quickButtons = document.querySelectorAll('.quick-btn');
+            console.log(`🔍 Намерени ${quickButtons.length} бързи бутона`);
+            
+            quickButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.getAttribute('data-action');
+                    console.log(`🎯 Натиснат бутон: ${action}`);
+                    handleQuickAction(action);
+                });
+            });
+            
+            // Езикови бутони
+            const langButtons = document.querySelectorAll('.lang-btn');
+            langButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    langButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            console.log('✅ Всички event listeners са закачени!');
+        });
+
+        // Глобални функции за HTML onclick атрибути
+        window.sendMessage = sendMessage;
+        window.handleQuickAction = handleQuickAction;
+    </script>
+</body>
+</html>
