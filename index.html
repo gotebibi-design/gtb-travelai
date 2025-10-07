@@ -195,7 +195,7 @@
             border: 2px solid #e2e8f0;
             border-radius: 15px;
             padding: 25px;
-            max-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
             background: var(--warm-white);
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
@@ -264,6 +264,29 @@
             background: var(--ocean-blue);
             color: white;
             transform: translateY(-2px);
+        }
+
+        .interactive-starter {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .cta-interactive {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+            font-size: 1.1rem;
+        }
+
+        .cta-interactive:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(245, 158, 11, 0.6);
         }
 
         .professional-disclaimer {
@@ -639,6 +662,12 @@
                 </div>
             </div>
 
+            <div class="interactive-starter">
+                <button class="cta-interactive" onclick="startNewConversation()">
+                    <span>💬 Започнете интерактивен разговор</span>
+                </button>
+            </div>
+
             <div class="quick-actions">
                 <button class="quick-btn" onclick="quickAction('flights')">✈️ Търсене на полети</button>
                 <button class="quick-btn" onclick="quickAction('hotels')">🏨 Хотели и настаняване</button>
@@ -777,6 +806,149 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // ==================== ИНТЕРАКТИВЕН ДИАЛОГ СИСТЕМА ====================
+
+        let conversationState = {
+            currentStep: 'welcome',
+            destination: '',
+            dates: '',
+            travelers: '',
+            budget: '',
+            preferences: '',
+            purpose: '',
+            isActive: false
+        };
+
+        // 👇 ФУНКЦИЯ ЗА СТАРТИРАНЕ НА НОВ РАЗГОВОР
+        function startNewConversation() {
+            conversationState = {
+                currentStep: 'destination',
+                destination: '',
+                dates: '',
+                travelers: '',
+                budget: '',
+                preferences: '',
+                purpose: '',
+                isActive: true
+            };
+            
+            addMessage('💬 Започваме интерактивен разговор! Разкажете ми за вашето мечтано пътуване!', 'ai');
+            setTimeout(() => {
+                addMessage(getNextQuestion(), 'ai');
+            }, 1000);
+        }
+
+        // 👇 ФУНКЦИЯ ЗА СЛЕДВАЩ ВЪПРОС
+        function getNextQuestion() {
+            switch(conversationState.currentStep) {
+                case 'destination':
+                    return `🌍 <strong>За коя дестинация мечтаете?</strong><br>
+• Например: Париж, Рим, Лондон, Милано, Истанбул...`;
+
+                case 'dates':
+                    return `📅 <strong>За кои дати планирате пътуването?</strong><br>
+• Например: 15-20 декември, 10-17 януари, уикенд 23-25 май...`;
+
+                case 'travelers':
+                    return `👥 <strong>За колко души е пътуването?</strong><br>
+• Например: 2 възрастни, семейство с 2 деца, 1 човек...`;
+
+                case 'purpose':
+                    return `🎯 <strong>Какъв е поводът за пътуването?</strong><br>
+• 🏖️ Почивка и релакс<br>
+• 💼 Бизнес пътуване<br>
+• 💍 Специален повод<br>
+• 🎭 Култура и изкуство<br>
+• 🛍️ Шопинг и гурме`;
+
+                case 'budget':
+                    return `💰 <strong>Какъв е вашият бюджет за пътуването?</strong><br>
+• 💸 Икономичен (до €800 за човек)<br>
+• 💰 Стандартен (€800-€1,500 за човек)<br>
+• 💎 Луксозен (над €1,500 за човек)`;
+
+                case 'preferences':
+                    return `⭐ <strong>Какви са вашите предпочитания за настаняване?</strong><br>
+• 🏨 Хотели (3-5 звезди)<br>
+• 🏠 Апартаменти<br>
+• 🏖️ Resort комплекс<br>
+• 🏰 Boutique хотел`;
+
+                default:
+                    return 'Благодаря за информацията!';
+            }
+        }
+
+        // 👇 ФУНКЦИЯ ЗА ОБРАБОТКА НА ОТГОВОРИ
+        function processConversationAnswer(userMessage) {
+            const message = userMessage.toLowerCase();
+            
+            switch(conversationState.currentStep) {
+                case 'destination':
+                    conversationState.destination = userMessage;
+                    conversationState.currentStep = 'dates';
+                    return `🌍 <strong>Отличен избор! ${userMessage} е прекрасна дестинация!</strong>`;
+
+                case 'dates':
+                    conversationState.dates = autoCompleteDates(userMessage);
+                    conversationState.currentStep = 'travelers';
+                    return `📅 <strong>Разбрах! ${conversationState.dates}</strong>`;
+
+                case 'travelers':
+                    conversationState.travelers = userMessage;
+                    conversationState.currentStep = 'purpose';
+                    return `👥 <strong>Отлично! ${userMessage}</strong>`;
+
+                case 'purpose':
+                    conversationState.purpose = userMessage;
+                    conversationState.currentStep = 'budget';
+                    return `🎯 <strong>${getPurposeResponse(userMessage)}</strong>`;
+
+                case 'budget':
+                    conversationState.budget = userMessage;
+                    conversationState.currentStep = 'preferences';
+                    return `💰 <strong>Разбрах бюджета Ви!</strong>`;
+
+                case 'preferences':
+                    conversationState.preferences = userMessage;
+                    conversationState.currentStep = 'complete';
+                    return generateFinalProposal();
+
+                default:
+                    return generateAIResponse(userMessage);
+            }
+        }
+
+        // 👇 ФУНКЦИЯ ЗА КРАЕН ПРЕДЛОГ
+        function generateFinalProposal() {
+            conversationState.isActive = false;
+            
+            return `🎉 <strong>ПЕРФЕКТНО! Събрах всичката информация и вече мога да Ви предложа най-добрите варианти!</strong><br><br>
+
+📋 <strong>ВАШАТА ЗАЯВКА:</strong><br>
+• 🌍 <strong>Дестинация:</strong> ${conversationState.destination}<br>
+• 📅 <strong>Дати:</strong> ${conversationState.dates}<br>
+• 👥 <strong>Пътници:</strong> ${conversationState.travelers}<br>
+• 🎯 <strong>Цел:</strong> ${conversationState.purpose}<br>
+• 💰 <strong>Бюджет:</strong> ${conversationState.budget}<br>
+• ⭐ <strong>Предпочитания:</strong> ${conversationState.preferences}<br><br>
+
+⏳ <strong>Анализирам най-добрите оферти за Вас...</strong>`;
+        }
+
+        // 👇 ПОМОЩНИ ФУНКЦИИ
+        function getPurposeResponse(purpose) {
+            const responses = {
+                'почивка': '🏖️ Чудесно! Ще Ви намеря идеални места за релакс и почивка!',
+                'бизнес': '💼 Разбирам! Ще включа бизнес хотели и удобни полети за Вашата работа.',
+                'сватба': '💍 Романтично! Ще предложим специални места за незабравимо преживяване!',
+                'култура': '🎭 Страхотно! Фокусирам се върху културни забележителности и музеи.',
+                'шопинг': '🛍️ Отлично! Ще включа най-добрите шопинг райони и молове.'
+            };
+            
+            return responses[purpose.toLowerCase()] || '🎯 Разбирам! Ще Ви предложим най-подходящите опции за Вашата цел!';
+        }
+
         // ==================== ОСНОВНИ ФУНКЦИИ ====================
         
         function addMessage(text, sender) {
@@ -797,8 +969,30 @@
                 input.value = '';
                 
                 setTimeout(() => {
-                    const aiResponse = generateAIResponse(message);
-                    addMessage(aiResponse, 'ai');
+                    let aiResponse;
+                    
+                    // 👇 ПРОВЕРКА ДАЛИ СМЕ В ИНТЕРАКТИВЕН РАЗГОВОР
+                    if (conversationState.isActive && conversationState.currentStep !== 'complete') {
+                        aiResponse = processConversationAnswer(message);
+                        addMessage(aiResponse, 'ai');
+                        
+                        // 👇 АКО НЕ СМЕ ЗАВЪРШИЛИ, ПОКАЗВАМЕ СЛЕДВАЩИЯ ВЪПРОС
+                        if (conversationState.currentStep !== 'complete') {
+                            setTimeout(() => {
+                                addMessage(getNextQuestion(), 'ai');
+                            }, 1000);
+                        } else {
+                            // 👇 АКО СМЕ ЗАВЪРШИЛИ, ГЕНЕРИРАМЕ ДЕТАЙЛЕН АНАЛИЗ
+                            setTimeout(() => {
+                                const finalAnalysis = generateDetailedAnalysis();
+                                addMessage(finalAnalysis, 'ai');
+                            }, 2000);
+                        }
+                    } else {
+                        // 👇 СТАНДАРТЕН AI ОТГОВОР
+                        aiResponse = generateAIResponse(message);
+                        addMessage(aiResponse, 'ai');
+                    }
                 }, 1000);
             }
         }
@@ -934,15 +1128,15 @@
                 (message.includes('sofia') && message.includes('london'))) {
                 
                 return generateLondonResponse(message);
-            }         
-       
-             // 🎯 ДОБАВИ ТУК РАЗПОЗНАВАНЕТО ЗА МИЛАНО
+            }
+
+            // 🎯 РАЗПОЗНАВАНЕ ЗА МИЛАНО
             if ((message.includes('софия') && message.includes('милано')) || 
                 (message.includes('sofia') && message.includes('milan')) ||
                 (message.includes('20.11') && message.includes('25.11'))) {
                 
-                return `... [кода отгоре] ...`;
-             }
+                return generateMilanResponse(message);
+            }
 
             // 🏖️ РАЗПОЗНАВАНЕ НА BEACH VILLAS ОФЕРТА
             if ((message.includes('февруари 2026') && message.includes('beach villa')) || 
@@ -1047,6 +1241,8 @@
 • "Хотели в Рим за 3 нощувки"<br>
 • "Пакетна оферта за Малдиви"<br>
 • "Бизнес пътуване до Лондон"<br><br>
+
+<strong>Или кликнете на бутона "Започнете интерактивен разговор" за поетапна помощ!</strong><br><br>
 
 <strong>С какво мога да ви помогна днес?</strong>`;
             }
@@ -1171,7 +1367,7 @@
 
         // 🔧 ФУНКЦИЯ ЗА АВТОМАТИЧНО ПОПЪЛВАНЕ НА ДАТИ
         function autoCompleteDates(message) {
-            const currentYear = 2025; // ФИКСИРАНО ЗА 2025!
+            const currentYear = 2025;
             const nextYear = 2026;
             
             // Заменя дати без година (23.10 до 27.10) → (23.10.2025 до 27.10.2025)
@@ -1182,6 +1378,34 @@
             message = message.replace(/(\d{1,2})\.(\d{1,2})(?!\.\d{4})/g, `$1.$2.${currentYear}`);
             
             return message;
+        }
+
+        // 👇 ФУНКЦИЯ ЗА ДЕТАЙЛЕН АНАЛИЗ СЛЕД ИНТЕРАКТИВЕН РАЗГОВОР
+        function generateDetailedAnalysis() {
+            return `🎯 <strong>ДЕТАЙЛЕН АНАЛИЗ НА ВАШАТА ЗАЯВКА:</strong><br><br>
+
+📋 <strong>ВАШАТА ЗАЯВКА:</strong><br>
+• 🌍 <strong>Дестинация:</strong> ${conversationState.destination}<br>
+• 📅 <strong>Дати:</strong> ${conversationState.dates}<br>
+• 👥 <strong>Пътници:</strong> ${conversationState.travelers}<br>
+• 🎯 <strong>Цел:</strong> ${conversationState.purpose}<br>
+• 💰 <strong>Бюджет:</strong> ${conversationState.budget}<br>
+• ⭐ <strong>Предпочитания:</strong> ${conversationState.preferences}<br><br>
+
+💡 <strong>ПРЕПОРЪКИ И СЛЕДВАЩИ СТЪПКИ:</strong><br>
+1. <strong>Проверка на наличности</strong> за вашите дати<br>
+2. <strong>Сравнение на цени</strong> между платформи<br>
+3. <strong>Подбор на конкретни опции</strong> според предпочитанията Ви<br>
+4. <strong>Резервация</strong> с най-добрите условия<br><br>
+
+📞 <strong>ЗА ПЪЛНА ИНФОРМАЦИЯ И РЕЗЕРВАЦИЯ:</strong><br>
+<strong>Биляна: +359 885 07 89 80</strong><br>
+<em>Можем да проверим директно наличности и да намерим най-добрите оферти за вас!</em><br><br>
+
+🔗 <strong>ПОЛЕЗНИ ЛИНКОВЕ:</strong><br>
+• ✈️ <a href="https://www.google.com/travel/flights" target="_blank">Google Flights</a><br>
+• 🏨 <a href="https://www.booking.com" target="_blank">Booking.com</a><br>
+• 🎯 <a href="https://www.tripadvisor.com" target="_blank">TripAdvisor</a>`;
         }
 
         // 🎯 НОВИ ФУНКЦИИ ЗА ПОПУЛЯРНИ ДЕСТИНАЦИИ
@@ -1369,6 +1593,71 @@
 <strong>Биляна: +359 885 07 89 80</strong>`;
         }
 
+        // 🛍️ ФУНКЦИЯ ЗА МИЛАНО
+        function generateMilanResponse(message) {
+            return `🎯 <strong>ПЪЛЕН АНАЛИЗ: СОФИЯ → МИЛАНО</strong><br><br>
+
+## ✈️ <strong>ВАРИАНТИ ЗА ПОЛЕТИ:</strong><br>
+
+🅰️ <strong>ВАРИАНТ 1 - Wizz Air (Директен):</strong><br>
+• <strong>Цена:</strong> €80-150<br>
+• <strong>Време:</strong> 1ч 45м<br>
+• <strong>Летище:</strong> Малпенса (MXP)<br>
+• <strong>Предимства:</strong> Най-бързо и евтино<br><br>
+
+🅱️ <strong>ВАРИАНТ 2 - Ryanair (Директен):</strong><br>
+• <strong>Цена:</strong> €70-130<br>
+• <strong>Време:</strong> 2 часа<br>
+• <strong>Летище:</strong> Бергамо (BGY)<br>
+• <strong>Предимства:</strong> Най-евтин вариант<br><br>
+
+🅲 <strong>ВАРИАНТ 3 - Lufthansa (с прекачване):</strong><br>
+• <strong>Цена:</strong> €150-250<br>
+• <strong>Време:</strong> 4-6 часа<br>
+• <strong>Маршрут:</strong> София → Мюнхен → Милано<br>
+• <strong>Предимства:</strong> По-добро обслужване<br><br>
+
+## 🏨 <strong>ВАРИАНТИ ЗА ХОТЕЛИ В МИЛАНО:</strong><br>
+
+🛍️ <strong>ВАРИАНТ 1 - До Дуомо:</strong><br>
+• <strong>Хотел:</strong> Hotel Spadari al Duomo ⭐⭐⭐⭐<br>
+• <strong>Цена:</strong> €100-180/нощ<br>
+• <strong>Локация:</strong> Център, до катедралата<br>
+• <strong>Рейтинг:</strong> 8.7/10<br><br>
+
+🎭 <strong>ВАРИАНТ 2 - Район Брера:</strong><br>
+• <strong>Хотел:</strong> Hotel Berna ⭐⭐⭐⭐<br>
+• <strong>Цена:</strong> €80-140/нощ<br>
+• <strong>Локация:</strong> Брера, художествен квартал<br>
+• <strong>Рейтинг:</strong> 8.4/10<br><br>
+
+💎 <strong>ВАРИАНТ 3 - Луксозен избор:</strong><br>
+• <strong>Хотел:</strong> Four Seasons Milano ⭐⭐⭐⭐⭐<br>
+• <strong>Цена:</strong> €400-700/нощ<br>
+• <strong>Локация:</strong> Център, моден квартал<br>
+• <strong>Рейтинг:</strong> 9.3/10<br><br>
+
+## 💰 <strong>ОБЩИ РАЗХОДИ:</strong><br>
+
+• <strong>САМО ПОЛЕТИ:</strong> €70-250<br>
+• <strong>ХОТЕЛИ (5 нощувки):</strong> €400-900<br>
+• <strong>ОБЩО ПЪТУВАНЕ:</strong> €470-1,150<br><br>
+
+🔗 <strong>ДИРЕКТНА ПРОВЕРКА:</strong><br>
+• ✈️ <a href="https://www.google.com/travel/flights?q=SOF-MIL" target="_blank">Полети София-Милано</a><br>
+• 🏨 <a href="https://www.booking.com/searchresults.html?ss=Milan" target="_blank">Хотели в Милано</a><br><br>
+
+💡 <strong>ПРЕПОРЪКИ ЗА МИЛАНО:</strong><br>
+• 🎨 Посетете "Тайната вечеря" на Леонардо да Винчи<br>
+• 🛍️ Разходка по модната улица Via Montenapoleone<br>
+• ⚽ Стадион Джузепе Меаца (Сан Сиро)<br>
+• 🏛️ Катедралата Дуомо и покрива с панорамна гледка<br><br>
+
+📞 <strong>ЗА РЕЗЕРВАЦИЯ:</strong><br>
+<strong>Биляна: +359 885 07 89 80</strong><br>
+<em>Можем да намерим най-добрата оферта за вашите дати!</em>`;
+        }
+
         document.getElementById('user-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
@@ -1389,6 +1678,7 @@
                 { coords: [48.8566, 2.3522], name: "🗼 Париж, Франция", description: "Градът на светлината и любовта" },
                 { coords: [40.4168, -3.7038], name: "💃 Мадрид, Испания", description: "Живописна столица с топла атмосфера" },
                 { coords: [51.5074, -0.1278], name: "🇬🇧 Лондон, Англия", description: "Кралска столица с модерен дух" },
+                { coords: [45.4642, 9.1900], name: "🛍️ Милано, Италия", description: "Световна столица на модата и дизайна" },
                 { coords: [52.5200, 13.4050], name: "🏙️ Берлин, Германия", description: "Модерен град с бурна история" },
                 { coords: [38.7223, -9.1393], name: "🌊 Лисабон, Португалия", description: "Слънчев град със златни плажове" },
                 { coords: [41.0082, 28.9784], name: "🕌 Истанбул, Турция", description: "Мост между Европа и Азия" },
