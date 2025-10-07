@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GTB TravelAI | Професионален Пътнически Консултант</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        /* ЦЯЛАТА CSS ОСТАВА СЪЩАТА */
+        :root {
+            --ocean-blue: #1e40af;
+            --sand-beige: #fef3c7;
+            --sunset-orange: #f59e0b;
+            --forest-green: #059669;
+            --sky-blue: #38bdf8;
+            --deep-blue: #1e3a8a;
+            --warm-white: #fffbeb;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, var(--sky-blue) 0%, var(--ocean-blue) 100%);
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* ... ОСТАНАЛАТА CSS БЕЗ ПРОМЕНИ ... */
+        
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <div class="logo">GTB TravelAI</div>
+            <div class="language-switcher">
+                <button class="lang-btn active" data-lang="bg">🇧🇬 БГ</button>
+                <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+                <button class="lang-btn" data-lang="ru">🇷🇺 RU</button>
+                <button class="lang-btn" data-lang="it">🇮🇹 IT</button>
+                <button class="lang-btn" data-lang="es">🇪🇸 ES</button>
+                <button class="lang-btn" data-lang="cn">🇨🇳 中文</button>
+                <button class="lang-btn" data-lang="el">🇬🇷 EL</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="hero">
+            <h1 data-i18n="hero_title">Професионални Пътнически Решения</h1>
+            <p data-i18n="hero_subtitle">Вашият интелигентен партньор за световни пътешествия. AI технологии със сърце за пътешественици.</p>
+            <a href="#ai-chat" class="cta-button">
+                <span data-i18n="hero_cta">🎯 Започнете приключението</span>
+            </a>
+        </section>
+
+        <section id="ai-chat" class="ai-interface">
+            <h2 data-i18n="ai_title">AI Travel Консултант</h2>
+            
+            <div class="professional-disclaimer">
+                <span data-i18n="disclaimer">🚀 РАБОТИМ ЗА РЕАЛНИ ЦЕНИ В РЕАЛНО ВРЕМЕ! Развиваме система за моментална проверка на наличности и цени.</span>
+            </div>
+
+            <div class="chat-container" id="chat-messages">
+                <div class="message ai-message">
+                    <strong data-i18n="ai_welcome">Добър ден! Аз съм вашият професионален AI travel консултант. ✈️</strong><br><br>
+                    
+                    <span data-i18n="ai_services_title">🎯 Мога да ви асистирам с:</span><br>
+                    <span data-i18n="ai_service1">• Интелигентни препоръки за полети и хотели</span><br>
+                    <span data-i18n="ai_service2">• Сравнителен анализ на цени между платформи</span><br>
+                    <span data-i18n="ai_service3">• Персонализирани пътни маршрути</span><br>
+                    <span data-i18n="ai_service4">• Бизнес и лукс пътувания</span><br>
+                    <span data-i18n="ai_service5">• Emergency поддръжка и контакти</span><br><br>
+                    
+                    <span data-i18n="ai_procedure_title">💼 Процедура според нашия виртуален плейбук:</span><br>
+                    <span data-i18n="ai_step1">1. Детайлен анализ на вашите нужди</span><br>
+                    <span data-i18n="ai_step2">2. Проверка в множество платформи</span><br>
+                    <span data-i18n="ai_step3">3. Сравнение на цени и условия</span><br>
+                    <span data-i18n="ai_step4">4. Препоръка за директна резервация</span><br><br>
+                    
+                    <em data-i18n="ai_question">С какво мога да ви бъда полезен днес?</em>
+                </div>
+            </div>
+
+            <div class="interactive-starter">
+                <button class="cta-interactive" onclick="startNewConversation()">
+                    <span data-i18n="start_conversation">💬 Започнете интерактивен разговор</span>
+                </button>
+            </div>
+
+            <div class="quick-actions">
+                <button class="quick-btn" data-action="flights">
+                    <span data-i18n="quick_flights">✈️ Търсене на полети</span>
+                </button>
+                <button class="quick-btn" data-action="hotels">
+                    <span data-i18n="quick_hotels">🏨 Хотели и настаняване</span>
+                </button>
+                <button class="quick-btn" data-action="packages">
+                    <span data-i18n="quick_packages">🧳 Пакетни оферти</span>
+                </button>
+                <button class="quick-btn" data-action="business">
+                    <span data-i18n="quick_business">💼 Бизнес пътувания</span>
+                </button>
+            </div>
+
+            <div class="chat-input">
+                <input type="text" id="user-input" data-i18n="input_placeholder" placeholder="Опишете вашето пътуване... Например: Търся полети от София до Париж от 15-22 декември за 2 души">
+                <button id="send-btn">
+                    <span data-i18n="send_button">📨 Изпрати</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="map-section">
+            <h2 data-i18n="map_title">Световни Дестинации</h2>
+            <p data-i18n="map_subtitle" style="margin-bottom: 20px; color: #666;">Изследвайте популярни дестинации по целия свят. Кликнете върху маркери за повече информация.</p>
+            <div id="travel-map"></div>
+        </section>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">✈️</span>
+                <h3 data-i18n="feature1_title">Умни Полети</h3>
+                <p data-i18n="feature1_desc">Най-добри цени и интелигентни препоръки за полети по целия свят</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🏨</span>
+                <h3 data-i18n="feature2_title">Луксозни Хотели</h3>
+                <p data-i18n="feature2_desc">Препоръки за хотели според вашите предпочитания и бюджет</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🚗</span>
+                <h3 data-i18n="feature3_title">Транспортни Решения</h3>
+                <p data-i18n="feature3_desc">Коли под наем, трансфери и локален транспорт на най-добри цени</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🎯</span>
+                <h3 data-i18n="feature4_title">Пакетни Оферти</h3>
+                <p data-i18n="feature4_desc">Изгодни пакетни решения за цялостно и безпроблемно пътуване</p>
+            </div>
+        </div>
+
+        <!-- ОСТАНАЛАТА HTML СТРУКТУРА С ДОБАВЕНИ data-i18n АТРИБУТИ -->
+        
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3 data-i18n="footer_about">🌐 GTB TravelAI</h3>
+                <p data-i18n="footer_desc1">Вашият интелигентен партньор за пътешествия</p>
+                <p data-i18n="footer_desc2">AI-технологии със сърце за пътешественици</p>
+            </div>
+            <div class="footer-section">
+                <h3 data-i18n="footer_team">👥 Нашият Екип</h3>
+                <p><strong data-i18n="team_bilyana">🧳 Биляна Иванова</strong> - <span data-i18n="team_bilyana_desc">Travel експерт с 15+ години опит</span></p>
+                <p><strong data-i18n="team_gotse">🤖 Гоце Терзиев</strong> - <span data-i18n="team_gotse_desc">AI и технологии</span></p>
+            </div>
+            <div class="footer-section">
+                <h3 data-i18n="footer_contact">📞 Връзка с Нас</h3>
+                <p>📧 b.bilbilova@gmail.com</p>
+                <p>📱 +359 885 07 89 80</p>
+                <p data-i18n="work_hours">🕒 Пон-Пет: 9:00 - 18:00</p>
+                <p data-i18n="location">📍 София, България</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // ==================== МУЛТИЕЗИЧНОСТ ====================
+        
+        const translations = {
+            bg: {
+                // Hero Section
+                "hero_title": "Професионални Пътнически Решения",
+                "hero_subtitle": "Вашият интелигентен партньор за световни пътешествия. AI технологии със сърце за пътешественици.",
+                "hero_cta": "🎯 Започнете приключението",
+                
+                // AI Chat
+                "ai_title": "AI Travel Консултант",
+                "disclaimer": "🚀 РАБОТИМ ЗА РЕАЛНИ ЦЕНИ В РЕАЛНО ВРЕМЕ! Развиваме система за моментална проверка на наличности и цени.",
+                "ai_welcome": "Добър ден! Аз съм вашият професионален AI travel консултант. ✈️",
+                "ai_services_title": "🎯 Мога да ви асистирам с:",
+                "ai_service1": "• Интелигентни препоръки за полети и хотели",
+                "ai_service2": "• Сравнителен анализ на цени между платформи",
+                "ai_service3": "• Персонализирани пътни маршрути",
+                "ai_service4": "• Бизнес и лукс пътувания",
+                "ai_service5": "• Emergency поддръжка и контакти",
+                "ai_procedure_title": "💼 Процедура според нашия виртуален плейбук:",
+                "ai_step1": "1. Детайлен анализ на вашите нужди",
+                "ai_step2": "2. Проверка в множество платформи",
+                "ai_step3": "3. Сравнение на цени и условия",
+                "ai_step4": "4. Препоръка за директна резервация",
+                "ai_question": "С какво мога да ви бъда полезен днес?",
+                
+                // Buttons
+                "start_conversation": "💬 Започнете интерактивен разговор",
+                "quick_flights": "✈️ Търсене на полети",
+                "quick_hotels": "🏨 Хотели и настаняване",
+                "quick_packages": "🧳 Пакетни оферти",
+                "quick_business": "💼 Бизнес пътувания",
+                "input_placeholder": "Опишете вашето пътуване... Например: Търся полети от София до Париж от 15-22 декември за 2 души",
+                "send_button": "📨 Изпрати",
+                
+                // Map
+                "map_title": "Световни Дестинации",
+                "map_subtitle": "Изследвайте популярни дестинации по целия свят. Кликнете върху маркери за повече информация.",
+                
+                // Features
+                "feature1_title": "Умни Полети",
+                "feature1_desc": "Най-добри цени и интелигентни препоръки за полети по целия свят",
+                "feature2_title": "Луксозни Хотели",
+                "feature2_desc": "Препоръки за хотели според вашите предпочитания и бюджет",
+                "feature3_title": "Транспортни Решения",
+                "feature3_desc": "Коли под наем, трансфери и локален транспорт на най-добри цени",
+                "feature4_title": "Пакетни Оферти",
+                "feature4_desc": "Изгодни пакетни решения за цялостно и безпроблемно пътуване",
+                
+                // Footer
+                "footer_about": "🌐 GTB TravelAI",
+                "footer_desc1": "Вашият интелигентен партньор за пътешествия",
+                "footer_desc2": "AI-технологии със сърце за пътешественици",
+                "footer_team": "👥 Нашият Екип",
+                "team_bilyana": "🧳 Биляна Иванова",
+                "team_bilyana_desc": "Travel експерт с 15+ години опит",
+                "team_gotse": "🤖 Гоце Терзиев",
+                "team_gotse_desc": "AI и технологии",
+                "footer_contact": "📞 Връзка с Нас",
+                "work_hours": "🕒 Пон-Пет: 9:00 - 18:00",
+                "location": "📍 София, България"
+            },
+            
+            en: {
+                // Hero Section
+                "hero_title": "Professional Travel Solutions",
+                "hero_subtitle": "Your intelligent partner for worldwide journeys. AI technologies with a heart for travelers.",
+                "hero_cta": "🎯 Start Your Adventure",
+                
+                // AI Chat
+                "ai_title": "AI Travel Consultant",
+                "disclaimer": "🚀 WORKING FOR REAL PRICES IN REAL TIME! Developing instant availability and price checking system.",
+                "ai_welcome": "Good day! I am your professional AI travel consultant. ✈️",
+                "ai_services_title": "🎯 I can assist you with:",
+                "ai_service1": "• Smart flight and hotel recommendations",
+                "ai_service2": "• Comparative price analysis across platforms",
+                "ai_service3": "• Personalized travel routes",
+                "ai_service4": "• Business and luxury travel",
+                "ai_service5": "• Emergency support and contacts",
+                "ai_procedure_title": "💼 Procedure according to our virtual playbook:",
+                "ai_step1": "1. Detailed analysis of your needs",
+                "ai_step2": "2. Check across multiple platforms",
+                "ai_step3": "3. Price and condition comparison",
+                "ai_step4": "4. Recommendation for direct reservation",
+                "ai_question": "How can I help you today?",
+                
+                // Buttons
+                "start_conversation": "💬 Start Interactive Conversation",
+                "quick_flights": "✈️ Flight Search",
+                "quick_hotels": "🏨 Hotels & Accommodation",
+                "quick_packages": "🧳 Package Offers",
+                "quick_business": "💼 Business Travel",
+                "input_placeholder": "Describe your journey... For example: Looking for flights from Sofia to Paris from Dec 15-22 for 2 people",
+                "send_button": "📨 Send",
+                
+                // Map
+                "map_title": "World Destinations",
+                "map_subtitle": "Explore popular destinations worldwide. Click on markers for more information.",
+                
+                // Features
+                "feature1_title": "Smart Flights",
+                "feature1_desc": "Best prices and intelligent flight recommendations worldwide",
+                "feature2_title": "Luxury Hotels",
+                "feature2_desc": "Hotel recommendations according to your preferences and budget",
+                "feature3_title": "Transport Solutions",
+                "feature3_desc": "Car rentals, transfers and local transport at best prices",
+                "feature4_title": "Package Offers",
+                "feature4_desc": "Cost-effective package solutions for complete hassle-free travel",
+                
+                // Footer
+                "footer_about": "🌐 GTB TravelAI",
+                "footer_desc1": "Your intelligent travel partner",
+                "footer_desc2": "AI technologies with a heart for travelers",
+                "footer_team": "👥 Our Team",
+                "team_bilyana": "🧳 Bilyana Ivanova",
+                "team_bilyana_desc": "Travel expert with 15+ years experience",
+                "team_gotse": "🤖 Gotse Terziev",
+                "team_gotse_desc": "AI and technologies",
+                "footer_contact": "📞 Contact Us",
+                "work_hours": "🕒 Mon-Fri: 9:00 AM - 6:00 PM",
+                "location": "📍 Sofia, Bulgaria"
+            },
+            
+            ru: {
+                "hero_title": "Профессиональные Туристические Решения",
+                "hero_subtitle": "Ваш интеллектуальный партнер для путешествий по всему миру. AI технологии с сердцем для путешественников.",
+                "hero_cta": "🎯 Начните Приключение"
+                // ... добави останалите руски преводи
+            }
+        };
+
+        // Функция за смяна на езика
+        function changeLanguage(lang) {
+            // Запазваме избрания език
+            localStorage.setItem('preferred-language', lang);
+            
+            // Взимаме всички елементи с data-i18n атрибут
+            const elements = document.querySelectorAll('[data-i18n]');
+            
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) {
+                        element.setAttribute('placeholder', translations[lang][key]);
+                    } else {
+                        element.textContent = translations[lang][key];
+                    }
+                }
+            });
+            
+            // Обновяваме активния бутон
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-lang') === lang) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Добавяме съобщение в чата за смяна на езика
+            addMessage(`🌍 <strong>Language changed to ${getLanguageName(lang)}</strong><br>How can I assist you today?`, 'ai');
+        }
+
+        // Функция за име на езика
+        function getLanguageName(lang) {
+            const names = {
+                'bg': 'Bulgarian',
+                'en': 'English', 
+                'ru': 'Russian',
+                'it': 'Italian',
+                'es': 'Spanish',
+                'cn': 'Chinese',
+                'el': 'Greek'
+            };
+            return names[lang] || lang;
+        }
+
+        // ==================== ОСТАНАЛИТЕ ФУНКЦИИ ОСТАВАТ СЪЩИТЕ ====================
+        
+        function addMessage(text, type = 'ai') {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            messageDiv.innerHTML = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // ... ОСТАНАЛИТЕ ФУНКЦИИ (generateAIResponse, sendMessage, etc.) ОСТАВАТ СЪЩИТЕ ...
+
+        // ==================== EVENT LISTENERS ====================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 TravelAI е зареден и готов!');
+            
+            // Зареждане на предпочитания език
+            const savedLang = localStorage.getItem('preferred-language') || 'bg';
+            changeLanguage(savedLang);
+            
+            initMap();
+            
+            const sendBtn = document.getElementById('send-btn');
+            if (sendBtn) {
+                sendBtn.addEventListener('click', sendMessage);
+            }
+            
+            const userInput = document.getElementById('user-input');
+            if (userInput) {
+                userInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+            }
+            
+            const quickButtons = document.querySelectorAll('.quick-btn');
+            quickButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.getAttribute('data-action');
+                    handleQuickAction(action);
+                });
+            });
+            
+            // Езикови бутони - ДОБАВЕН EVENT LISTENER
+            const langButtons = document.querySelectorAll('.lang-btn');
+            langButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    changeLanguage(lang);
+                });
+            });
+        });
+
+        // Глобални функции
+        window.sendMessage = sendMessage;
+        window.handleQuickAction = handleQuickAction;
+        window.handleQuickSearch = handleQuickSearch;
+        window.startNewConversation = startNewConversation;
+        window.changeLanguage = changeLanguage; // ДОБАВЕНА
+    </script>
+</body>
+</html>
