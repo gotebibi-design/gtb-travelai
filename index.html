@@ -861,69 +861,52 @@
         };
 
         function changeLanguage(lang) {
-    localStorage.setItem('preferred-language', lang);
-    
-    // Промяна на текстовете
-    const elements = {
-        'hero_title': document.querySelector('.hero h1'),
-        'hero_subtitle': document.querySelector('.hero p'),
-        'hero_cta': document.querySelector('.cta-button span'),
-        'ai_title': document.querySelector('.ai-interface h2'),
-        'disclaimer': document.querySelector('.professional-disclaimer'),
-        'map_title': document.querySelector('.map-section h2'),
-        'map_subtitle': document.querySelector('.map-section p'),
-        'feature1_title': document.querySelector('.features-grid .feature-card:nth-child(1) h3'),
-        'feature1_desc': document.querySelector('.features-grid .feature-card:nth-child(1) p'),
-        'feature2_title': document.querySelector('.features-grid .feature-card:nth-child(2) h3'),
-        'feature2_desc': document.querySelector('.features-grid .feature-card:nth-child(2) p'),
-        'feature3_title': document.querySelector('.features-grid .feature-card:nth-child(3) h3'),
-        'feature3_desc': document.querySelector('.features-grid .feature-card:nth-child(3) p'),
-        'feature4_title': document.querySelector('.features-grid .feature-card:nth-child(4) h3'),
-        'feature4_desc': document.querySelector('.features-grid .feature-card:nth-child(4) p'),
-        'start_conversation': document.querySelector('.cta-interactive span'),
-        'quick_flights': document.querySelector('.quick-btn[data-action="flights"]'),
-        'quick_hotels': document.querySelector('.quick-btn[data-action="hotels"]'),
-        'quick_packages': document.querySelector('.quick-btn[data-action="packages"]'),
-        'quick_business': document.querySelector('.quick-btn[data-action="business"]'),
-        'input_placeholder': document.getElementById('user-input'),
-        'send_button': document.querySelector('#send-btn span')
-    };
+            localStorage.setItem('preferred-language', lang);
+            
+            const elements = {
+                'hero_title': document.querySelector('.hero h1'),
+                'hero_subtitle': document.querySelector('.hero p'),
+                'hero_cta': document.querySelector('.cta-button span'),
+                'ai_title': document.querySelector('.ai-interface h2'),
+                'disclaimer': document.querySelector('.professional-disclaimer'),
+                'map_title': document.querySelector('.map-section h2'),
+                'map_subtitle': document.querySelector('.map-section p'),
+                'feature1_title': document.querySelector('.features-grid .feature-card:nth-child(1) h3'),
+                'feature1_desc': document.querySelector('.features-grid .feature-card:nth-child(1) p'),
+                'feature2_title': document.querySelector('.features-grid .feature-card:nth-child(2) h3'),
+                'feature2_desc': document.querySelector('.features-grid .feature-card:nth-child(2) p'),
+                'feature3_title': document.querySelector('.features-grid .feature-card:nth-child(3) h3'),
+                'feature3_desc': document.querySelector('.features-grid .feature-card:nth-child(3) p'),
+                'feature4_title': document.querySelector('.features-grid .feature-card:nth-child(4) h3'),
+                'feature4_desc': document.querySelector('.features-grid .feature-card:nth-child(4) p'),
+                'start_conversation': document.querySelector('.cta-interactive span'),
+                'quick_flights': document.querySelector('.quick-btn[data-action="flights"]'),
+                'quick_hotels': document.querySelector('.quick-btn[data-action="hotels"]'),
+                'quick_packages': document.querySelector('.quick-btn[data-action="packages"]'),
+                'quick_business': document.querySelector('.quick-btn[data-action="business"]'),
+                'input_placeholder': document.getElementById('user-input'),
+                'send_button': document.querySelector('#send-btn span')
+            };
 
-    for (const [key, element] of Object.entries(elements)) {
-        if (element && translations[lang] && translations[lang][key]) {
-            if (key === 'input_placeholder') {
-                element.placeholder = translations[lang][key];
-            } else {
-                element.textContent = translations[lang][key];
+            for (const [key, element] of Object.entries(elements)) {
+                if (element && translations[lang] && translations[lang][key]) {
+                    if (key === 'input_placeholder') {
+                        element.placeholder = translations[lang][key];
+                    } else {
+                        element.textContent = translations[lang][key];
+                    }
+                }
             }
-        }
-    }
 
-    // Обновяване на активния бутон
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.getAttribute('data-lang') === lang) {
-            btn.classList.add('active');
-        }
-    });
-}
-
-            // ПРЕМАХНАХ СЪОБЩЕНИЕТО В ЧАТА ЗА СМЯНА НА ЕЗИКА
-            // Няма да се добавя повече "Language changed to..."
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-lang') === lang) {
+                    btn.classList.add('active');
+                }
+            });
         }
 
-        📞 <strong>СЛЕДВАЩА СТЪПКА - РЕЗЕРВАЦИЯ:</strong><br>
-        Обадете се на Биляна <strong>+359 885 07 89 80</strong> за:<br>
-                • Мигновена резервация на стаите<br>
-                • Осигуряване на самолетните билети<br>
-                • Подробности за условията и анулация<br><br>
-
-            🔗 <strong>БЪРЗИ ЛИНКОВЕ:</strong><br>
-• <a href="https://www.fourseasons.com/madrid" target="_blank">Four Seasons Madrid Official</a><br>
-• <a href="https://www.iberia.com" target="_blank">Iberia Airlines</a><br>
-• <a href="https://wizzair.com" target="_blank">Wizz Air</a>
-
-// ==================== ОСНОВНИ ФУНКЦИИ ====================
+        // ==================== ОСНОВНИ ФУНКЦИИ ====================
         
         function addMessage(text, type = 'ai') {
             const chatMessages = document.getElementById('chat-messages');
@@ -937,7 +920,6 @@
         function generateAIResponse(userMessage) {
             const lowerMessage = userMessage.toLowerCase();
             
-            // 🎯 РАЗПОЗНАВАНЕ НА МАДРИД ЗАЯВКАТА
             if ((lowerMessage.includes('мадрид') || lowerMessage.includes('madrid')) && 
                 (lowerMessage.includes('24.10') || lowerMessage.includes('27.10') || lowerMessage.includes('октомври'))) {
                 return `🎉 <strong>ПЕРФЕКТНО! НАМЕРИХ СУПЕР ОФЕРТИ ЗА МАДРИД!</strong><br><br>
@@ -973,7 +955,6 @@
                 • Подробности за условията и анулация`;
             }
 
-            // 🎯 РАЗПОЗНАВАНЕ НА ДУБАЙ ЗАЯВКАТА
             if ((lowerMessage.includes('дубай') || lowerMessage.includes('dubai')) && 
                 (lowerMessage.includes('24.10') || lowerMessage.includes('27.10') || lowerMessage.includes('октомври'))) {
                 return `🎉 <strong>ПЕРФЕКТНО! НАМЕРИХ ЛУКСОЗНИ ОФЕРТИ ЗА ДУБАЙ!</strong><br><br>
@@ -988,7 +969,6 @@
                 📞 <strong>РЕЗЕРВАЦИЯ:</strong> Обадете се на Биляна <strong>+359 885 07 89 80</strong>`;
             }
 
-            // 🎯 РАЗПОЗНАВАНЕ НА ИСТАНБУЛ ЗАЯВКИ
             if (lowerMessage.includes('истанбул') && (lowerMessage.includes('февруари') || lowerMessage.includes('14') || lowerMessage.includes('19'))) {
                 return `🎉 <strong>ПЕРФЕКТНО! Намерих супер оферти за Истанбул!</strong><br><br>
                 ✈️ <strong>САМОЛЕТНИ БИЛЕТИ София-Истанбул-София:</strong><br>
@@ -1006,7 +986,6 @@
                 📞 <strong>СЛЕДВАЩА СТЪПКА:</strong> Да резервираме? Обадете се на Биляна: +359 885 07 89 80`;
             }
 
-            // 🎯 РАЗПОЗНАВАНЕ НА ПАРИЖ ЗАЯВКИ
             if (lowerMessage.includes('париж') && lowerMessage.includes('софия')) {
                 return `✈️ <strong>ОТЛИЧНИ НОВИНИ ЗА ПАРИЖ!</strong><br><br>
                 🎯 <strong>Самолетни билети София-Париж-София:</strong><br>
@@ -1020,7 +999,6 @@
                 💡 <strong>Съвет:</strong> Wizz Air + Hotel Eiffel = най-добра цена!`;
             }
 
-            // 🎯 РАЗПОЗНАВАНЕ НА "ЧАКАМ ОФЕРТИТЕ"
             if (lowerMessage.includes('чакам') && lowerMessage.includes('оферти')) {
                 return `🚀 <strong>ВАШИТЕ ОФЕРТИ СА ГОТОВИ И ИЗПРАТЕНИ!</strong><br><br>
                 📋 <strong>ПРОВЕРЕТЕ ПО-ГОРЕ ДЕТАЙЛНИТЕ ОФЕРТИ ЗА ВАШАТА ДЕСТИНАЦИЯ.</strong><br><br>
@@ -1032,7 +1010,6 @@
                 ⚡ <strong>Спешно?</strong> Започваме резервацията ВЕДНАГА!`;
             }
 
-            // 🎯 ОБЩ ОТГОВОР ЗА НЕРАЗПОЗНАТИ ЗАЯВКИ
             return `🤖 <strong>РАЗБРАХ ВАШАТА ЗАЯВКА ЗА ПЪТУВАНЕ!</strong><br><br>
             
             🎯 <strong>ЗА ДА ВИ ДАМ ТОЧНИ ОФЕРТИ, МОЛЯ УТОЧНЕТЕ:</strong><br><br>
@@ -1126,7 +1103,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 TravelAI е зареден и готов!');
             
-            // Зареждане на език
             const savedLang = localStorage.getItem('preferred-language') || 'bg';
             changeLanguage(savedLang);
             
@@ -1149,6 +1125,11 @@
                     changeLanguage(this.getAttribute('data-lang'));
                 });
             });
+
+            const ctaInteractive = document.querySelector('.cta-interactive');
+            if (ctaInteractive) {
+                ctaInteractive.addEventListener('click', startNewConversation);
+            }
         });
 
         window.sendMessage = sendMessage;
