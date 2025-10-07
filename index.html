@@ -934,7 +934,15 @@
                 (message.includes('sofia') && message.includes('london'))) {
                 
                 return generateLondonResponse(message);
-            }
+            }         
+       
+             // 🎯 ДОБАВИ ТУК РАЗПОЗНАВАНЕТО ЗА МИЛАНО
+            if ((message.includes('софия') && message.includes('милано')) || 
+                (message.includes('sofia') && message.includes('milan')) ||
+                (message.includes('20.11') && message.includes('25.11'))) {
+                
+                return `... [кода отгоре] ...`;
+             }
 
             // 🏖️ РАЗПОЗНАВАНЕ НА BEACH VILLAS ОФЕРТА
             if ((message.includes('февруари 2026') && message.includes('beach villa')) || 
