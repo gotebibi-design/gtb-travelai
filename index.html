@@ -1,0 +1,210 @@
+<script>
+// ==================== ОСНОВНИ ФУНКЦИИ ====================
+
+function addMessage(text, type = 'ai') {
+    const chatMessages = document.getElementById('chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${type}-message`;
+    messageDiv.innerHTML = text;
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// 🎯 ПО-ИНТЕЛИГЕНТНА ФУНКЦИЯ ЗА ОТГОВОРИ
+function generateAIResponse(userMessage) {
+    const lowerMessage = userMessage.toLowerCase();
+    
+    // 🎯 РАЗПОЗНАВАНЕ НА КОНКРЕТНИ ЗАЯВКИ
+    if (lowerMessage.includes('истанбул') && (lowerMessage.includes('февруари') || lowerMessage.includes('14') || lowerMessage.includes('19'))) {
+        return `🎉 <strong>ПЕРФЕКТНО! Намерих супер оферти за Истанбул!</strong><br><br>
+        
+        ✈️ <strong>САМОЛЕТНИ БИЛЕТИ София-Истанбул-София:</strong><br>
+        • <strong>Turkish Airlines</strong>: €187 ид-назад (багаж 23kg включен)<br>
+        • <strong>Pegasus Airlines</strong>: €134 ид-назад (hand luggage only)<br>
+        • <strong>Wizz Air</strong>: €156 ид-назад (Сабиха Гьокчен)<br><br>
+        
+        🏨 <strong>ХОТЕЛИ 5 нощувки за 2 възрастни:</strong><br>
+        • <strong>Ramada by Wyndham Istanbul Old City</strong>: €420 total (4⭐, супер локация)<br>
+        • <strong/Hotel Sultania</strong>: €380 total (boutique хотел, закуска включена)<br>
+        • <strong>CVK Hotel</strong>: €520 total (5⭐ лукс, спа център)<br><br>
+        
+        💰 <strong>ОБЩО ПАКЕТ:</strong><br>
+        • <strong>Turkish Airlines + Ramada Hotel</strong>: €607 за двамата<br>
+        • <strong>Pegasus + Hotel Sultania</strong>: €514 за двамата<br><br>
+        
+        🎯 <strong>ПРЕПОРЪКА:</strong> Turkish Airlines + Ramada Hotel - най-добра стойност!<br><br>
+        
+        📞 <strong>СЛЕДВАЩА СТЪПКА:</strong> Да резервираме? Обадете се на Биляна: +359 885 07 89 80`;
+    }
+    
+    if (lowerMessage.includes('чакам') || lowerMessage.includes('кога') || lowerMessage.includes('оферти')) {
+        return `🚀 <strong>ОФЕРТИТЕ СА ГОТОВИ!</strong> Вижте по-горе детайлния анализ.<br><br>
+        
+        💼 <strong>Процедура за резервация:</strong><br>
+        1. <strong>Изберете опция</strong> от горните оферти<br>
+        2. <strong>Обадете се на Биляна</strong>: +359 885 07 89 80<br>
+        3. <strong>Потвърдете резервацията</strong> в рамките на 24 часа<br>
+        4. <strong>Получете потвърждение</strong> по имейл и WhatsApp<br><br>
+        
+        ⚡ <strong>Спешно?</strong> Започваме резервацията ВЕДНАГА!`;
+    }
+    
+    if (lowerMessage.includes('софия') && lowerMessage.includes('париж')) {
+        return `✈️ <strong>ОТЛИЧНИ НОВИНИ ЗА ПАРИЖ!</strong><br><br>
+        
+        🎯 <strong>Самолетни билети София-Париж-София:</strong><br>
+        • <strong>Air France</strong>: €245 ид-назад (Шарл де Гол)<br>
+        • <strong>Wizz Air</strong>: €89 ид-набав (Бове)<br>
+        • <strong>Lufthansa</strong>: €198 през Мюнхен<br><br>
+        
+        🏨 <strong>Хотели в Париж (център):</strong><br>
+        • <strong>Hotel Eiffel Trocadero</strong>: €65/нощ (3⭐)<br>
+        • <strong>Hotel du Louvre</strong>: €120/нощ (4⭐)<br>
+        • <strong>Le Bristol Paris</strong>: €450/нощ (5⭐ лукс)<br><br>
+        
+        💡 <strong>Съвет:</strong> Wizz Air + Hotel Eiffel = най-добра цена!`;
+    }
+    
+    if (lowerMessage.includes('софия') && lowerMessage.includes('рим')) {
+        return `✈️ <strong>MAMA MIA! Оферти за Рим!</strong><br><br>
+        
+        🎯 <strong>Самолетни билети:</strong><br>
+        • <strong>Ryanair</strong>: €67 ид-набав (Бергамо)<br>
+        • <strong>Wizz Air</strong>: €79 ид-назад (Чампино)<br>
+        • <strong>Bulgaria Air</strong>: €185 ид-назад (Фучино)<br><br>
+        
+        🏨 <strong>Хотели в Рим (център):</strong><br>
+        • <strong>Hotel Colosseum</strong>: €55/нощ (3⭐ до Колизеума)<br>
+        • <strong>Hotel Artemide</strong>: €110/нощ (4⭐ лукс)<br>
+        • <strong>Hotel Raphael</strong>: €180/нощ (5⭐ с тераса)<br><br>
+        
+        🎭 <strong>Екскурзии включени:</strong> Колизеум, Ватикан, Фонтан ди Треви`;
+    }
+
+    // 🎯 РАЗПОЗНАВАНЕ НА ОБЩИ ЗАЯВКИ
+    if (lowerMessage.includes('хотел') || lowerMessage.includes('настаняване')) {
+        return `🏨 <strong>ДА НАМЕРИМ ПЕРФЕКТНИЯ ХОТЕЛ!</strong><br><br>
+        
+        📚 <strong>Нашата процедура за хотели:</strong><br>
+        1. <strong>Booking.com</strong> - проверка на рейтинги над 8.5<br>
+        2. <strong>Hotels.com</strong> - rewards програма<br>
+        3. <strong>Директно с хотела</strong> - за по-добри цени<br><br>
+        
+        🎯 <strong>Критерии които проверяваме:</strong><br>
+        • Безплатно анулиране<br>
+        • Закуска включена<br>
+        • Централно местоположение<br>
+        • Безплатен WiFi<br><br>
+        
+        💬 <strong>Уточнете:</strong> Дестинация, дати, брой гости и бюджет?`;
+    }
+
+    if (lowerMessage.includes('бюджет') || lowerMessage.includes('цена')) {
+        return `💰 <strong>РАЗБИРАМ БЮДЖЕТА!</strong><br><br>
+        
+        💎 <strong>Нива на обслужване:</strong><br>
+        • <strong>Икономичен</strong>: до €400/човек (всичко включено)<br>
+        • <strong>Стандартен</strong>: €400-€800/човек (комфорт и качество)<br>
+        • <strong>Комфортен</strong>: €800-€1,200/човек (лукс и екстри)<br>
+        • <strong>Премиум</strong>: над €1,200/човек (VIP услуги)<br><br>
+        
+        🎯 <strong>Винаги включваме:</strong> Travel insurance, такси, 24/7 поддръжка`;
+    }
+
+    // 🎯 ОБЩ ОТГОВОР С ПРЕДЛОЖЕНИЯ
+    return `🤖 <strong>РАЗБРАХ! "${userMessage}"</strong><br><br>
+    
+    🎯 <strong>ЗА ДА ВИ ДАМ ТОЧНИ ОФЕРТИ, ИМАМ НУЖДА ОТ:</strong><br>
+    
+    🌍 <strong>Дестинация:</strong> София-Истанбул, София-Париж, София-Рим?<br>
+    📅 <strong>Дати:</strong> Конкретни дати или период?<br>
+    👥 <strong>Пътници:</strong> Брой възрастни/деца?<br>
+    🏨 <strong>Настаняване:</strong> Хотел, апартамент, resort?<br>
+    💰 <strong>Бюджет:</strong> Икономичен, стандартен, лукс?<br><br>
+    
+    💡 <strong>ПРИМЕР ЗАЯВКА:</strong> "Търся полети и хотел от София до Истанбул от 14-19 февруари за 2 възрастни, бюджет до €600"<br><br>
+    
+    📞 <strong>ИЛИ СЕ ОБАДЕТЕ ДИРЕКТНО НА БИЛЯНА:</strong> +359 885 07 89 80`;
+}
+
+function sendMessage() {
+    const userInput = document.getElementById('user-input');
+    const message = userInput.value.trim();
+    
+    if (message === '') return;
+    
+    addMessage(message, 'user');
+    userInput.value = '';
+    
+    setTimeout(() => {
+        const aiResponse = generateAIResponse(message);
+        addMessage(aiResponse, 'ai');
+    }, 1000);
+}
+
+function handleQuickAction(action) {
+    let message = '';
+    
+    switch(action) {
+        case 'flights':
+            message = 'Търся полети. Моля, уточнете: От коя дестинация до коя? Конкретни дати? Брой пътници?';
+            break;
+        case 'hotels':
+            message = 'Търся хотели. Моля, уточнете: Дестинация? Дати на настаняване? Брой гости? Предпочитан тип хотел?';
+            break;
+        case 'packages':
+            message = 'Търся пакетни оферти. Моля, уточнете: Дестинация? Период? Брой пътници? Бюджет?';
+            break;
+        case 'business':
+            message = 'Търся бизнес пътувания. Моля, уточнете: Компания? Изисквания? Дати? Клас на пътуване?';
+            break;
+    }
+    
+    document.getElementById('user-input').value = message;
+    sendMessage();
+}
+
+// ==================== EVENT LISTENERS ====================
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 TravelAI е зареден и готов!');
+    
+    // Send button
+    const sendBtn = document.getElementById('send-btn');
+    if (sendBtn) {
+        sendBtn.addEventListener('click', sendMessage);
+    }
+    
+    // Enter key
+    const userInput = document.getElementById('user-input');
+    if (userInput) {
+        userInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    }
+    
+    // Quick buttons
+    const quickButtons = document.querySelectorAll('.quick-btn');
+    quickButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const action = this.getAttribute('data-action');
+            handleQuickAction(action);
+        });
+    });
+    
+    // Language buttons
+    const langButtons = document.querySelectorAll('.lang-btn');
+    langButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            langButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+});
+
+// Global functions
+window.sendMessage = sendMessage;
+window.handleQuickAction = handleQuickAction;
+</script>
