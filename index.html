@@ -486,6 +486,7 @@
                 
                 заявка = заявка.toLowerCase();
                 
+                // ПОПРАВЕН КОД - използваме for...in правилно
                 for (let ключ in отговори) {
                     if (заявка.includes(ключ)) {
                         const отговор = отговори[ключ][Math.floor(Math.random() * отговори[ключ].length)];
@@ -579,7 +580,8 @@
                 
                 заявка = заявка.toLowerCase();
                 
-                for (let ключ в отговори) {
+                // ПОПРАВЕН КОД - използваме for...in правилно
+                for (let ключ in отговори) {
                     if (заявка.includes(ключ)) {
                         travelMemory.addKnowledge(`pro_${ключ}`, заявка);
                         return отговори[ключ];
