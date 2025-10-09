@@ -1,234 +1,77 @@
-<!DOCTYPE html>
-<html lang="bg">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 GBT TravelAI</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; padding: 30px; text-align: center; }
-        .mode-selector { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
-        .mode-btn { padding: 12px 25px; border: none; border-radius: 25px; font-size: 16px; cursor: pointer; transition: all 0.3s ease; }
-        .mode-btn.active { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .novak-mode { background: #28a745; color: white; }
-        .pro-mode { background: #007bff; color: white; }
-        .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 30px; }
-        @media (max-width: 768px) { .main-content { grid-template-columns: 1fr; } }
-        .chat-container { background: #f8f9fa; border-radius: 15px; padding: 20px; border: 2px solid #e9ecef; }
-        .chat-messages { height: 400px; overflow-y: auto; padding: 15px; background: white; border-radius: 10px; margin-bottom: 15px; border: 1px solid #dee2e6; }
-        .message { margin-bottom: 15px; padding: 12px; border-radius: 10px; max-width: 80%; }
-        .user-message { background: #007bff; color: white; margin-left: auto; }
-        .ai-message { background: #28a745; color: white; margin-right: auto; }
-        .pro-message { background: #dc3545; color: white; margin-right: auto; }
-        .input-container { display: flex; gap: 10px; }
-        .chat-input { flex: 1; padding: 12px; border: 2px solid #dee2e6; border-radius: 10px; font-size: 16px; }
-        .send-btn { background: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-size: 16px; }
-        .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 15px; }
-        .quick-btn { background: white; border: 2px solid #007bff; color: #007bff; padding: 10px; border-radius: 8px; cursor: pointer; text-align: center; transition: all 0.3s ease; }
-        .quick-btn:hover { background: #007bff; color: white; }
-        .hidden { display: none; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🚀 GBT TravelAI</h1>
-            <p>Вашият професионален AI консултант за пътувания ✈️</p>
-            <div class="mode-selector">
-                <button class="mode-btn novak-mode active" onclick="switchMode('novak')">🤖 Novak AI</button>
-                <button class="mode-btn pro-mode" onclick="switchMode('pro')">💼 Професионален</button>
-            </div>
-        </div>
-
-        <div class="main-content">
-            <div class="chat-container">
-                <h2 id="chatTitle">💬 Чат с Новак AI</h2>
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message ai-message">🤖 Здрасти! Аз съм Новак - вашият AI консултант за пътувания!</div>
-                </div>
-                <div class="input-container">
-                    <input type="text" class="chat-input" id="userInput" placeholder="Попитай ме за пътувания..." onkeypress="handleKeyPress(event)">
-                    <button class="send-btn" onclick="sendMessage()">Изпрати</button>
-                </div>
-                
-                <div class="quick-actions" id="novakActions">
-                    <div class="quick-btn" onclick="quickAction('дестинации')">🏝️ Дестинации</div>
-                    <div class="quick-btn" onclick="quickAction('бюджет')">💰 Бюджет</div>
-                    <div class="quick-btn" onclick="quickAction('съвети')">🎯 Съвети</div>
-                </div>
-
-                <div class="quick-actions hidden" id="proActions">
-                    <div class="quick-btn" onclick="quickAction('полети истанбул')">✈️ Истанбул</div>
-                    <div class="quick-btn" onclick="quickAction('полети дубай')">🌴 Дубай</div>
-                    <div class="quick-btn" onclick="quickAction('полети рим')">🏛️ Рим</div>
-                    <div class="quick-btn" onclick="quickAction('резервация')">📞 Резервация</div>
-                </div>
-            </div>
-
-            <div class="chat-container">
-                <h2>📞 Директна резервация</h2>
-                <div class="message pro-message">
-                    <h3>🚀 ЗА НЕЗАБАВНА РЕЗЕРВАЦИЯ:</h3>
-                    <p>Обадете се на Биляна:</p>
-                    <h2 style="color: #ffc107; margin: 10px 0;">+359 885 07 89 80</h2>
-                    <p>📧 Професионална поддръжка за:</p>
-                    <ul style="text-align: left; margin: 10px 0;">
-                        <li>✈️ Самолетни билети</li>
-                        <li>🏨 Хотели и настаняване</li>
-                        <li>🚗 Транспорт и коли</li>
-                        <li>🎫 Екскурзии и забавления</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let currentMode = 'novak';
-
-        // 🎯 ПРОФЕСИОНАЛЕН AI С РЕАЛНИ ДАННИ ЗА ПОЛЕТИ
-        const ProfessionalAI = {
-            обработиЗаявка: function(заявка) {
-                if (заявка.toLowerCase().includes('полет') || this.еДестинация(заявка)) {
-                    return this.дайПолетнаИнформация(заявка);
-                }
-                return this.общОтговор(заявка);
+// 🔄 ОБНОВЕН PROFESSIONAL AI
+const ProfessionalAI = {
+    обработиЗаявка: async function(заявка) {
+        travelMemory.addConversation(заявка, "", 'pro');
+        
+        // 🎯 ИНТЕЛИГЕНТЕН АНАЛИЗ НА ЗАЯВКАТА
+        const анализ = IntelligentParser.анализирайЗаявка(заявка);
+        
+        if (анализ.дестинация) {
+            return this.генерирайКомплексенОтговор(анализ);
+        }
+        
+        return this.общОтговор(заявка);
+    },
+    
+    генерирайКомплексенОтговор: function(анализ) {
+        const дестинацияИме = this.вземиИмеНаДестинация(анализ.дестинация);
+        
+        let отговор = `🎯 **КОМПЛЕКСНА ОФЕРТА: СОФИЯ - ${дестинацияИме}**\n\n`;
+        
+        // ✈️ ПОЛЕТНА ИНФОРМАЦИЯ
+        отговор += `✈️ **ПОЛЕТИ:**\n`;
+        const полети = this.вземиПолетнаИнформация(анализ.дестинация, анализ.приоритет);
+        полети.forEach(полет => отговор += `${полет}\n`);
+        
+        // 🏨 ХОТЕЛНА ИНФОРМАЦИЯ  
+        if (анализ.специфики.includes('hotel')) {
+            отговор += `\n🏨 **НАСТАНЯВАНЕ (${анализ.нощувки} нощувки):**\n`;
+            const хотели = this.вземиХотелнаИнформация(анализ.дестинация, анализ.нощувки);
+            хотели.forEach(хотел => отговор += `${хотел}\n`);
+        }
+        
+        // 💡 СЪВЕТИ БАЗИРАНИ НА АНАЛИЗА
+        отговор += `\n💡 **ПЕРСОНАЛИЗИРАНИ СЪВЕТИ:**\n`;
+        отговор += this.генерирайСъвети(анализ);
+        
+        // 📞 CALL TO ACTION
+        отговор += `\n📞 **ЗА ТОЧНИ ЦЕНИ И РЕЗЕРВАЦИЯ:**\n`;
+        отговор += `Обадете се на Биляна: +359 885 07 89 80\n\n`;
+        отговор += `🎯 Ще ви подготвим пълна оферта с точни цени!`;
+        
+        return отговор;
+    },
+    
+    вземиПолетнаИнформация: function(дестинация, приоритет) {
+        const полетниДанни = {
+            'DXB': {
+                price: ["✈️ FZ 789 • 22:15-05:30+1 • от 359 лв. (най-евтин)", "✈️ EK 142 • 09:30-16:45 • от 399 лв."],
+                speed: ["✈️ EK 142 • 09:30-16:45 • от 399 лв. (най-бърз)", "✈️ FZ 789 • 22:15-05:30+1 • от 359 лв."],
+                balanced: ["✈️ EK 142 • 09:30-16:45 • от 399 лв.", "✈️ FZ 789 • 22:15-05:30+1 • от 359 лв."]
             },
-
-            еДестинация: function(заявка) {
-                const дестинации = ['истанбул', 'дубай', 'рим', 'париж', 'мадрид', 'лондон'];
-                return дестинации.some(дест => заявка.toLowerCase().includes(дест));
-            },
-
-            дайПолетнаИнформация: function(заявка) {
-                const полетниДанни = {
-                    'истанбул': {
-                        полети: [
-                            "✈️ TK 1023 • 08:00-10:30 • от 89 лв.",
-                            "✈️ W6 4567 • 14:20-16:45 • от 79 лв.", 
-                            "✈️ FB 891 • 19:15-21:40 • от 95 лв."
-                        ],
-                        съвет: "🚀 Най-добри цени при резервация 2-3 седмици предварително"
-                    },
-                    'дубай': {
-                        полети: [
-                            "✈️ EK 142 • 09:30-16:45 • от 399 лв.",
-                            "✈️ FZ 789 • 22:15-05:30+1 • от 359 лв."
-                        ],
-                        съвет: "🎫 Специални оферти за ранно резервиране"
-                    },
-                    'рим': {
-                        полети: [
-                            "✈️ FR 2345 • 06:45-08:30 • от 69 лв.",
-                            "✈️ AZ 567 • 13:20-15:05 • от 85 лв.",
-                            "✈️ W6 4321 • 18:00-19:45 • от 59 лв."
-                        ],
-                        съвет: "🏛️ Идеално за уикенд пътувания"
-                    }
-                };
-
-                let намеренаДестинация = null;
-                for (let дест in полетниДанни) {
-                    if (заявка.toLowerCase().includes(дест)) {
-                        намеренаДестинация = дест;
-                        break;
-                    }
-                }
-
-                if (!намеренаДестинация) {
-                    return `✈️ **ИНФОРМАЦИЯ ЗА ПОЛЕТИ:**\n\nЗа коя дестинация се интересувате?\n\n🎯 Популярни дестинации: Истанбул, Дубай, Рим\n\n📞 За точни оферти: Обадете се на Биляна: +359 885 07 89 80`;
-                }
-
-                const данни = полетниДанни[намеренаДестинация];
-                let отговор = `✈️ **ПОЛЕТИ СОФИЯ - ${намеренаДестинация.toUpperCase()}:**\n\n`;
-                данни.полети.forEach(полет => { отговор += `${полет}\n`; });
-                отговор += `\n💡 ${данни.съвет}`;
-                отговор += `\n\n📞 **ЗА РЕАЛНИ ЦЕНИ И РЕЗЕРВАЦИЯ:**`;
-                отговор += `\nОбадете се на Биляна: +359 885 07 89 80`;
-                
-                return отговор;
-            },
-
-            общОтговор: function(заявка) {
-                return `💼 **ПРОФЕСИОНАЛЕН ОТГОВОР:**\n\nРазбрах вашата заявка!\n\n🎯 За точна информация за:\n• ✈️ Полети и цени\n• 🏨 Хотели и настаняване  \n• 🗺️ Пътни маршрути\n\n📞 Обадете се на Биляна: +359 885 07 89 80\n\n💫 Ще ви осигурим най-добрите оферти!`;
+            'IST': {
+                price: ["✈️ W6 4567 • 14:20-16:45 • от 79 лв. (най-евтин)", "✈️ TK 1023 • 08:00-10:30 • от 89 лв."],
+                speed: ["✈️ TK 1023 • 08:00-10:30 • от 89 лв. (най-бърз)", "✈️ W6 4567 • 14:20-16:45 • от 79 лв."],
+                balanced: ["✈️ TK 1023 • 08:00-10:30 • от 89 лв.", "✈️ W6 4567 • 14:20-16:45 • от 79 лв."]
             }
         };
-
-        // 🤖 NOVAK AI 
-        const NovakAI = {
-            обработиЗаявка: function(заявка) {
-                const отговори = {
-                    'здрасти': "🎉 Здравей! Радвам се да те видя! Искаш ли да планираме приключение?",
-                    'дестинации': "🏝️ Препоръчвам: Истанбул, Дубай, Рим, Париж, Лондон!",
-                    'бюджет': "💰 Имам идеи за всеки бюджет - от 500лв до лукс!",
-                    'съвети': "🎯 Резервирай предварително и пътувай извън сезона!",
-                    'default': "🤔 Интересуваш ли се от дестинации, бюджет или съвети?"
-                };
-                
-                заявка = заявка.toLowerCase();
-                for (let ключ in отговори) {
-                    if (заявка.includes(ключ)) return отговори[ключ];
-                }
-                return отговори.default;
-            }
+        
+        return полетниДанни[дестинация]?.[приоритет] || ["✈️ Проверяваме наличности..."];
+    },
+    
+    вземиХотелнаИнформация: function(дестинация, нощувки) {
+        const хотелниДанни = {
+            'DXB': [
+                `🏨 Rove City Centre • 3* • от 280 лв. за ${нощувки} нощувки`,
+                `🏨 Millennium Plaza • 4* • от 420 лв. за ${нощувки} нощувки`,
+                `🏨 Address Downtown • 5* • от 680 лв. за ${нощувки} нощувки`
+            ],
+            'IST': [
+                `🏨 The President • 4* • от 180 лв. за ${нощувки} нощувки`,
+                `🏨 CVK Hotel • 5* • от 320 лв. за ${нощувки} нощувки`
+            ]
         };
-
-        // 🎯 ОСНОВНИ ФУНКЦИИ
-        function switchMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.${mode}-mode`).classList.add('active');
-            document.getElementById('chatTitle').textContent = mode === 'novak' ? '💬 Чат с Новак AI' : '💼 Професионален консултант';
-            document.getElementById('novakActions').classList.toggle('hidden', mode !== 'novak');
-            document.getElementById('proActions').classList.toggle('hidden', mode === 'novak');
-            
-            const message = mode === 'novak' ? 
-                "🤖 Здрасти! Аз съм Новак - вашият AI консултант за пътувания! 🎯" : 
-                "💼 Добър ден! Професионален travel консултант на линия! ✈️\n\nМога да ви помогна с полети, хотели и пътувания!\n\n📞 За резервации: +359 885 07 89 80";
-            
-            addMessage(message, mode === 'novak' ? 'ai' : 'pro');
-        }
-
-        function handleKeyPress(event) { 
-            if (event.key === 'Enter') sendMessage(); 
-        }
-
-        function sendMessage() {
-            const userInput = document.getElementById('userInput');
-            const message = userInput.value.trim();
-            if (message === '') return;
-            
-            addMessage(message, 'user');
-            userInput.value = '';
-            
-            setTimeout(() => {
-                let response = currentMode === 'novak' ? 
-                    NovakAI.обработиЗаявка(message) : 
-                    ProfessionalAI.обработиЗаявка(message);
-                addMessage(response, currentMode === 'novak' ? 'ai' : 'pro');
-            }, 500);
-        }
-
-        function addMessage(text, sender) {
-            const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}-message`;
-            messageDiv.innerHTML = text;
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function quickAction(action) { 
-            document.getElementById('userInput').value = action; 
-            sendMessage(); 
-        }
-
-        // ИНИЦИАЛИЗАЦИЯ
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('userInput').focus();
-        });
-    </script>
-</body>
-</html>
+        
+        return хотелниДанни[дестинация] || [`🏨 Намираме подходящи хотели...`];
+    }
+};
