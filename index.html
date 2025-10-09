@@ -90,7 +90,7 @@
     <script>
         let currentMode = 'novak';
 
-        // 🎯 ИНТЕЛИГЕНТЕН QUERY PARSER - НОВ ДОБАВЕН
+        // 🎯 ИНТЕЛИГЕНТЕН QUERY PARSER
         const IntelligentParser = {
             анализирайЗаявка: function(заявка) {
                 const анализ = {
@@ -176,7 +176,7 @@
 
         // 🎯 ПРОФЕСИОНАЛЕН AI С ИНТЕЛИГЕНТЕН PARSER
         const ProfessionalAI = {
-            обработиЗаявка: async function(заявка) {
+            обработиЗаявка: function(заявка) {
                 // 🎯 ИНТЕЛИГЕНТЕН АНАЛИЗ НА ЗАЯВКАТА
                 const анализ = IntelligentParser.анализирайЗаявка(заявка);
                 
@@ -333,12 +333,24 @@
             
             addMessage(message, 'user');
             userInput.value = '';
+            userInput.disabled = true;
             
+            // 🎯 ПОПРАВЕН КОД - ПРАВИЛНА ОБРАБОТКА НА RESPONSE
             setTimeout(() => {
-                let response = currentMode === 'novak' ? 
-                    NovakAI.обработиЗаявка(message) : 
-                    ProfessionalAI.обработиЗаявка(message);
-                addMessage(response, currentMode === 'novak' ? 'ai' : 'pro');
+                try {
+                    let response;
+                    if (currentMode === 'novak') {
+                        response = NovakAI.обработиЗаявка(message);
+                    } else {
+                        response = ProfessionalAI.обработиЗаявка(message);
+                    }
+                    addMessage(response, currentMode === 'novak' ? 'ai' : 'pro');
+                } catch (error) {
+                    addMessage('❌ Възникна грешка. Моля, опитайте отново.', 'pro');
+                } finally {
+                    userInput.disabled = false;
+                    userInput.focus();
+                }
             }, 500);
         }
 
