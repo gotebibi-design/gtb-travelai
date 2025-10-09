@@ -287,9 +287,16 @@
             }
         };
 
-        // 🤖 NOVAK AI 
+        // 🤖 NOVAK AI - С ПРЕПРАТКА НА КОМПЛЕКСНИ ЗАЯВКИ КЪМ PROFESSIONAL AI
         const NovakAI = {
             обработиЗаявка: function(заявка) {
+                // 🎯 АКО ЗАЯВКАТА Е КОМПЛЕКСНА - ПРЕПРАТИ Я КЪМ PROFESSIONAL AI
+                const анализ = IntelligentParser.анализирайЗаявка(заявка);
+                if (анализ.дестинация) {
+                    return ProfessionalAI.обработиЗаявка(заявка);
+                }
+                
+                // 🎯 АКО Е ПРОСТА ЗАЯВКА - ОБРАБОТИ Я С NOVAK AI
                 const отговори = {
                     'здрасти': "🎉 Здравей! Радвам се да те видя! Искаш ли да планираме приключение?",
                     'дестинации': "🏝️ Препоръчвам: Истанбул, Дубай, Рим, Париж, Лондон!",
@@ -335,15 +342,29 @@
             userInput.value = '';
             userInput.disabled = true;
             
-            // 🎯 ПОПРАВЕН КОД - ПРАВИЛНА ОБРАБОТКА НА RESPONSE
+            // 🎯 СИГУРНА ОБРАБОТКА БЕЗ ASYNC/AWAIT ПРОБЛЕМИ
             setTimeout(() => {
+                let response;
                 try {
-                    let response;
                     if (currentMode === 'novak') {
                         response = NovakAI.обработиЗаявка(message);
                     } else {
                         response = ProfessionalAI.обработиЗаявка(message);
                     }
+                    
+                    // 🎯 ПРОВЕРКА ДАЛИ response Е Promise
+                    if (response && typeof response.then === 'function') {
+                        response.then(finalResponse => {
+                            addMessage(finalResponse, currentMode === 'novak' ? 'ai' : 'pro');
+                        }).catch(error => {
+                            addMessage('❌ Възникна грешка. Моля, опитайте отново.', 'pro');
+                        }).finally(() => {
+                            userInput.disabled = false;
+                            userInput.focus();
+                        });
+                        return;
+                    }
+                    
                     addMessage(response, currentMode === 'novak' ? 'ai' : 'pro');
                 } catch (error) {
                     addMessage('❌ Възникна грешка. Моля, опитайте отново.', 'pro');
