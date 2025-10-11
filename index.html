@@ -105,7 +105,7 @@
         
         .suggestions {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 4px;
             padding: 8px;
             background: #f8fafc;
@@ -283,7 +283,7 @@
         
         <div class="suggestions">
             <div class="suggestion-chip" onclick="askQuestion('onlineTickets')">
-                <span id="suggestion-tickets">🎫 Онлайн Билети</span>
+                <span id="suggestion-tickets">🎫 Билети</span>
             </div>
             <div class="suggestion-chip" onclick="askQuestion('timeEstimate')">
                 <span id="suggestion-time">⏱️ Време</span>
@@ -293,6 +293,9 @@
             </div>
             <div class="suggestion-chip" onclick="askQuestion('prices')">
                 <span id="suggestion-prices">💰 Цени</span>
+            </div>
+            <div class="suggestion-chip" onclick="askQuestion('flights')">
+                <span>✈️ Полетни</span>
             </div>
         </div>
         
@@ -568,7 +571,8 @@
                 `🎫 Билети за ${destination.museums[0]?.name || 'музеи'}`,
                 `⏱️ Време за посещения`,
                 `🗓️ План за ${destination.name}`,
-                `💰 Цени за ${destination.name}`
+                `💰 Цени за ${destination.name}`,
+                `✈️ Полетни билети`
             ];
             
             const suggestionChips = document.querySelectorAll('.suggestion-chip span');
@@ -590,7 +594,14 @@
             const lowerMessage = message.toLowerCase();
             const destination = destinations[currentDestination];
             
-            if (lowerMessage.includes('време') || lowerMessage.includes('time') || lowerMessage.includes('колко')) {
+            if (lowerMessage.includes('самолет') || lowerMessage.includes('полет') || 
+                lowerMessage.includes('flight') || lowerMessage.includes('авио') ||
+                lowerMessage.includes('летище') || lowerMessage.includes('airport') ||
+                lowerMessage.includes('билет софия') || lowerMessage.includes('bilet') ||
+                lowerMessage.includes('самолетни') || lowerMessage.includes('лети')) {
+                return generateFlightsResponse(destination);
+            }
+            else if (lowerMessage.includes('време') || lowerMessage.includes('time') || lowerMessage.includes('колко')) {
                 return generateTimeResponse(destination);
             }
             else if (lowerMessage.includes('план') || lowerMessage.includes('plan') || lowerMessage.includes('itiner')) {
@@ -608,6 +619,26 @@
             else {
                 return generateUnknownResponse(destination);
             }
+        }
+
+        function generateFlightsResponse(dest) {
+            return `<div class="info-card">
+                <strong>✈️ ПОЛЕТИ СОФИЯ - ${dest.name.toUpperCase()}</strong>
+                <br><br><strong>🎫 СРЕДНИ ЦЕНИ:</strong>
+                <br>• Икономичен клас: <strong>80-150 €</strong> (еднопосочен)
+                <br>• Бизнес клас: <strong>200-400 €</strong> (еднопосочен)
+                <br><br><strong>🛫 АВИОКОМПАНИИ:</strong>
+                <br>• Bulgaria Air • Wizz Air • Ryanair
+                <br><br><strong>⏱️ ПРОДЪЛЖИТЕЛНОСТ:</strong>
+                <br>• Директен полет: <strong>2.5-3 часа</strong>
+                <br><br><strong>💡 СЪВЕТИ:</strong>
+                <br>• Резервирай 2-3 месеца предварително
+                <br>• Избери полети в неделя или вторник
+                <br>• Провери багажните allowances
+                <br><br><strong>🌐 ТЪРСИ ПОЛЕТИ:</strong>
+                <button class="action-btn" onclick="window.open('https://www.skyscanner.net', '_blank')">✈️ SkyScanner</button>
+                <button class="action-btn" onclick="window.open('https://www.google.com/travel/flights', '_blank')">🔍 Google Flights</button>
+            </div>`;
         }
 
         function generateTimeResponse(dest) {
@@ -697,6 +728,7 @@
                 <br>• <strong>Планове</strong> за пътуване
                 <br>• <strong>Цени</strong> и бюджет
                 <br>• <strong>Транспорт</strong> в града
+                <br>• <strong>Полетни билети</strong> от София
             </div>`;
         }
 
@@ -720,6 +752,9 @@
                     break;
                 case 'prices': 
                     question = `Цени и бюджет за ${dest.name}`; 
+                    break;
+                case 'flights': 
+                    question = `Самолетни билети София - ${dest.name}`; 
                     break;
             }
             
@@ -755,6 +790,11 @@
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
+
+        // Инициализация при зареждане
+        document.addEventListener('DOMContentLoaded', function() {
+            changeDestination('rome');
+        });
     </script>
 </body>
 </html>
