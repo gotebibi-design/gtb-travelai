@@ -3,396 +3,1069 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 GBT TravelAI - Вашият AI Консултант за Пътувания</title>
+    <title>Travel AI Assistant - Умният пътеводител</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; padding: 30px; text-align: center; }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .header p { font-size: 1.2em; opacity: 0.9; }
-        .mode-selector { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
-        .mode-btn { padding: 12px 25px; border: none; border-radius: 25px; font-size: 16px; cursor: pointer; transition: all 0.3s ease; }
-        .mode-btn.active { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .novak-mode { background: #28a745; color: white; }
-        .pro-mode { background: #007bff; color: white; }
-        .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 30px; }
-        @media (max-width: 768px) { .main-content { grid-template-columns: 1fr; } }
-        .chat-container { background: #f8f9fa; border-radius: 15px; padding: 20px; border: 2px solid #e9ecef; }
-        .chat-messages { height: 400px; overflow-y: auto; padding: 15px; background: white; border-radius: 10px; margin-bottom: 15px; border: 1px solid #dee2e6; }
-        .message { margin-bottom: 15px; padding: 12px; border-radius: 10px; max-width: 80%; }
-        .user-message { background: #007bff; color: white; margin-left: auto; }
-        .ai-message { background: #28a745; color: white; margin-right: auto; }
-        .pro-message { background: #dc3545; color: white; margin-right: auto; }
-        .input-container { display: flex; gap: 10px; }
-        .chat-input { flex: 1; padding: 12px; border: 2px solid #dee2e6; border-radius: 10px; font-size: 16px; }
-        .send-btn { background: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-size: 16px; }
-        .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 15px; }
-        .quick-btn { background: white; border: 2px solid #007bff; color: #007bff; padding: 10px; border-radius: 8px; cursor: pointer; text-align: center; transition: all 0.3s ease; }
-        .quick-btn:hover { background: #007bff; color: white; }
-        .hidden { display: none; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh; 
+            padding: 6px;
+        }
+        .chat-container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 99vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #8B4513 0%, #CD853F 100%);
+            color: white;
+            padding: 10px 10px 6px 10px;
+            text-align: center;
+        }
+        
+        .language-switcher {
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+        .lang-btn {
+            background: rgba(255,255,255,0.15);
+            color: #FFEB3B;
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 2px 5px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 22px;
+            text-align: center;
+        }
+        .lang-btn:hover, .lang-btn.active {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 14px;
+            margin-bottom: 3px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .header p {
+            font-size: 9px;
+            opacity: 0.9;
+        }
+        
+        .suggestions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+            padding: 8px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .suggestion-chip {
+            background: linear-gradient(135deg, #6D4C41, #8D6E63);
+            color: white;
+            border: none;
+            padding: 5px 6px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 9px;
+            transition: all 0.3s ease;
+            text-align: center;
+            line-height: 1.1;
+        }
+        .suggestion-chip:hover {
+            transform: translateY(-1px);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            background: #f8f9fa;
+        }
+        .message {
+            margin-bottom: 6px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            max-width: 96%;
+            animation: fadeIn 0.3s ease-in;
+            font-size: 11px;
+            line-height: 1.2;
+        }
+        .user-message {
+            background: linear-gradient(135deg, #4A6572, #344955);
+            color: white;
+            margin-left: auto;
+        }
+        .ai-message {
+            background: white;
+            border: 1px solid #e0e0e0;
+            margin-right: auto;
+        }
+        
+        .input-area {
+            padding: 8px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 5px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 14px;
+            font-size: 11px;
+        }
+        button {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 11px;
+            min-width: 55px;
+        }
+        
+        .info-card {
+            background: #E8F5E9;
+            border-left: 3px solid #4CAF50;
+            border-radius: 5px;
+            padding: 6px;
+            margin: 4px 0;
+            font-size: 10px;
+            line-height: 1.2;
+        }
+        .tip-card {
+            background: #FFF3CD;
+            border-left: 3px solid #FFC107;
+            border-radius: 5px;
+            padding: 6px;
+            margin: 4px 0;
+            font-size: 10px;
+            line-height: 1.2;
+        }
+        .action-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 4px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 2px;
+            font-size: 9px;
+            display: inline-block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 360px) {
+            body { padding: 4px; }
+            .chat-container { 
+                height: 99vh; 
+                border-radius: 12px;
+            }
+            .header { 
+                padding: 8px 8px 4px 8px; 
+            }
+            .header h1 { 
+                font-size: 12px; 
+            }
+            .header p { font-size: 8px; }
+            .suggestions { 
+                gap: 3px; 
+                padding: 6px; 
+            }
+            .suggestion-chip { 
+                padding: 4px 5px; 
+                font-size: 8px; 
+            }
+            .chat-messages { padding: 6px; }
+            .message { 
+                padding: 5px 6px; 
+                font-size: 10px; 
+            }
+            .input-area { padding: 6px; }
+            input[type="text"] { 
+                padding: 5px 8px; 
+                font-size: 10px; 
+            }
+            button { 
+                padding: 5px 10px; 
+                font-size: 10px; 
+                min-width: 50px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="chat-container">
         <div class="header">
-            <h1>🚀 GBT TravelAI</h1>
-            <p>Вашият професионален AI консултант за пътувания ✈️</p>
-            <div class="mode-selector">
-                <button class="mode-btn novak-mode active" onclick="switchMode('novak')">🤖 Novak AI</button>
-                <button class="mode-btn pro-mode" onclick="switchMode('pro')">💼 Професионален</button>
+            <h1 id="header-title">🎨 ПЪТЕВОДИТЕЛ AI - ФЛОРЕНЦИЯ</h1>
+            <p id="header-subtitle">Интелигентен помощник за вашето пътуване</p>
+            
+            <div class="language-switcher">
+                <div class="lang-btn active" onclick="changeLanguage('bg')">БГ</div>
+                <div class="lang-btn" onclick="changeLanguage('en')">EN</div>
+                <div class="lang-btn" onclick="changeLanguage('it')">IT</div>
+                <div class="lang-btn" onclick="changeLanguage('es')">ES</div>
+                <div class="lang-btn" onclick="changeLanguage('fr')">FR</div>
             </div>
         </div>
-
-        <div class="main-content">
-            <div class="chat-container">
-                <h2 id="chatTitle">💬 Чат с Новак AI</h2>
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message ai-message">🤖 Здрасти! Аз съм Новак - вашият AI консултант за пътувания!</div>
-                </div>
-                <div class="input-container">
-                    <input type="text" class="chat-input" id="userInput" placeholder="Попитай ме за пътувания..." onkeypress="handleKeyPress(event)">
-                    <button class="send-btn" onclick="sendMessage()">Изпрати</button>
-                </div>
-                
-                <div class="quick-actions" id="novakActions">
-                    <div class="quick-btn" onclick="quickAction('дестинации')">🏝️ Дестинации</div>
-                    <div class="quick-btn" onclick="quickAction('бюджет')">💰 Бюджет</div>
-                    <div class="quick-btn" onclick="quickAction('съвети')">🎯 Съвети</div>
-                </div>
-
-                <div class="quick-actions hidden" id="proActions">
-                    <div class="quick-btn" onclick="quickAction('полети истанбул')">✈️ Истанбул</div>
-                    <div class="quick-btn" onclick="quickAction('полети дубай')">🌴 Дубай</div>
-                    <div class="quick-btn" onclick="quickAction('полети рим')">🏛️ Рим</div>
-                    <div class="quick-btn" onclick="quickAction('резервация')">📞 Резервация</div>
-                </div>
+        
+        <div class="suggestions">
+            <div class="suggestion-chip" onclick="askQuestion('onlineTickets')">
+                <span id="suggestion-tickets">🎫 Онлайн Билети</span>
             </div>
-
-            <div class="chat-container">
-                <h2>📞 Директна резервация</h2>
-                <div class="message pro-message">
-                    <h3>🚀 ЗА НЕЗАБАВНА РЕЗЕРВАЦИЯ:</h3>
-                    <p>Обадете се на Биляна:</p>
-                    <h2 style="color: #ffc107; margin: 10px 0;">+359 885 07 89 80</h2>
-                    <p>📧 Професионална поддръжка за:</p>
-                    <ul style="text-align: left; margin: 10px 0;">
-                        <li>✈️ Самолетни билети</li>
-                        <li>🏨 Хотели и настаняване</li>
-                        <li>🚗 Транспорт и коли</li>
-                        <li>🎫 Екскурзии и забавления</li>
-                    </ul>
-                </div>
+            <div class="suggestion-chip" onclick="askQuestion('timeEstimate')">
+                <span id="suggestion-time">⏱️ Време</span>
             </div>
+            <div class="suggestion-chip" onclick="askQuestion('travelPlan')">
+                <span id="suggestion-plan">🗓️ План</span>
+            </div>
+            <div class="suggestion-chip" onclick="askQuestion('prices')">
+                <span id="suggestion-prices">💰 Цени</span>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message ai-message">
+                <strong id="welcome-message">🤖 Здравейте!</strong> 
+                <span id="welcome-text">Аз съм вашият интелигентен пътеводител. Мога да ви помогна с: онлайн резервации, планиране на време, маршрути и цени!</span>
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Попитайте за време, резервации или планиране..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">
+                <span id="send-button">Изпрати</span>
+            </button>
         </div>
     </div>
 
     <script>
-        let currentMode = 'novak';
-
-        // 🎯 ИНТЕЛИГЕНТЕН QUERY PARSER
-        const IntelligentParser = {
-            анализирайЗаявка: function(заявка) {
-                const анализ = {
-                    дестинация: this.извлечиДестинация(заявка),
-                    дати: this.извлечиДата(заявка),
-                    нощувки: this.извлечиНощувки(заявка), 
-                    типПътуване: this.извлечиТипПътуване(заявка),
-                    специфики: this.извлечиСпецифики(заявка),
-                    приоритет: this.извлечиПриоритет(заявка)
-                };
-                
-                console.log('🎯 AI АНАЛИЗ:', анализ);
-                return анализ;
+        // МУЛТИЕЗИЧНА БАЗА ДАННИ
+        const translations = {
+            bg: {
+                texts: {
+                    headerTitle: "🎨 ПЪТЕВОДИТЕЛ AI - ФЛОРЕНЦИЯ",
+                    headerSubtitle: "Интелигентен помощник за вашето пътуване",
+                    onlineTickets: "Онлайн резервации за Капела Медичи",
+                    timeEstimate: "Колко време отнема да видя всички музеи",
+                    travelPlan: "Помогни ми да планирам пътуване",
+                    prices: "Цени за Флоренция",
+                    sendButton: "Изпрати",
+                    placeholder: "Попитайте за време, резервации или планиране...",
+                    welcomeMessage: "🤖 Здравейте!",
+                    welcomeText: "Аз съм вашият интелигентен пътеводител. Мога да ви помогна с: онлайн резервации, планиране на време, маршрути и цени!"
+                },
+                responses: {
+                    timeEstimate: `<div class="info-card"><strong>⏱️ ОЦЕНКА НА ВРЕМЕТО ЗА ПОСЕЩЕНИЕ:</strong><br><strong>🎨 ОСНОВНИ МУЗЕИ:</strong><br>• Капела Медичи: <strong>1-2 часа</strong><br>• Галерия Уфици: <strong>3-4 часа</strong><br>• Академия (Давид): <strong>1-2 часа</strong><br><strong>💡 СЪВЕТ:</strong> Разпределете музеите в различни дни и започнете рано сутринта!</div>`,
+                    travelPlan: `<div class="info-card"><strong>🗓️ ПРИМЕРЕН ПЛАН ЗА 3 ДЕНЯ ВО ФЛОРЕНЦИЯ:</strong><br><strong>📅 ДЕН 1: РЕНЕСАНСОВО ИЗКУСТВО</strong><br>• 09:00 - Галерия Уфици<br>• 14:00 - Обяд в местен ресторант<br>• 16:00 - Понте Векьо<br><strong>📅 ДЕН 2: МИКЕЛАНДЖЕЛО</strong><br>• 08:30 - Академия (Давид)<br>• 11:00 - Капела Медичи<br>• 18:00 - Залез в Пиацале Микеланджело</div>`,
+                    onlineTickets: `<div class="info-card"><strong>🎫 ОНЛАЙН РЕЗЕРВАЦИИ - КАПЕЛА МЕДИЧИ</strong><br>💰 <strong>Цена:</strong> 8-20 €<br>⏰ <strong>Резервирай:</strong> 2-4 седмици предварително<br>🌐 <strong>Официален сайт:</strong> b-ticket.com<br><strong>✅ СЪВЕТИ:</strong><br>• Резервирай сутринта<br>• Избери "Cappelle Medicee"<br>• Пристигни 15 мин преди часа</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Официален сайт</button>`,
+                    prices: `<div class="info-card"><strong>💰 ЦЕНИ ЗА ФЛОРЕНЦИЯ</strong><br><strong>🎫 МУЗЕИ:</strong><br>• Капела Медичи: 8-20 €<br>• Галерия Уфици: 20-35 €<br>• Академия: 12-25 €<br><strong>🏨 ПАКЕТИ:</strong><br>• Културен (5 дни): 620 €<br>• Премиум (7 дни): 890 €</div>`,
+                    unknown: `<div class="tip-card"><strong>🤔 Не разбрах въпроса ви напълно.</strong><br>Моля, попитайте ме за:<br>• <strong>Време</strong> за посещения<br>• <strong>Билети</strong> и резервации<br>• <strong>Планове</strong> за пътуване<br>• <strong>Цени</strong> за музеи</div>`
+                }
             },
-            
-            извлечиДестинация: function(заявка) {
-                const дестинации = {
-                    'дубай': 'DXB', 'dubai': 'DXB',
-                    'истанбул': 'IST', 'istanbul': 'IST',
-                    'рим': 'ROM', 'rome': 'ROM', 
-                    'париж': 'PAR', 'paris': 'PAR',
-                    'мадрид': 'MAD', 'madrid': 'MAD',
-                    'лондон': 'LON', 'london': 'LON'
-                };
-                
-                for (let дест in дестинации) {
-                    if (заявка.toLowerCase().includes(дест)) {
-                        return дестинации[дест];
-                    }
+            en: {
+                texts: {
+                    headerTitle: "🎨 TRAVEL GUIDE AI - FLORENCE",
+                    headerSubtitle: "Your intelligent travel companion",
+                    onlineTickets: "Online tickets for Medici Chapel",
+                    timeEstimate: "How much time to see all museums",
+                    travelPlan: "Help me plan my trip",
+                    prices: "Prices for Florence",
+                    sendButton: "Send",
+                    placeholder: "Ask about time, reservations or planning...",
+                    welcomeMessage: "🤖 Hello!",
+                    welcomeText: "I'm your intelligent travel guide. I can help with: online reservations, time planning, routes and prices!"
+                },
+                responses: {
+                    timeEstimate: `<div class="info-card"><strong>⏱️ TIME ESTIMATES FOR VISITS:</strong><br><strong>🎨 MAIN MUSEUMS:</strong><br>• Medici Chapel: <strong>1-2 hours</strong><br>• Uffizi Gallery: <strong>3-4 hours</strong><br>• Accademia (David): <strong>1-2 hours</strong><br><strong>💡 TIP:</strong> Spread museums across different days and start early morning!</div>`,
+                    travelPlan: `<div class="info-card"><strong>🗓️ SAMPLE 3-DAY FLORENCE ITINERARY:</strong><br><strong>📅 DAY 1: RENAISSANCE ART</strong><br>• 09:00 - Uffizi Gallery<br>• 14:00 - Lunch in local restaurant<br>• 16:00 - Ponte Vecchio<br><strong>📅 DAY 2: MICHELANGELO</strong><br>• 08:30 - Accademia (David)<br>• 11:00 - Medici Chapel<br>• 18:00 - Sunset at Piazzale Michelangelo</div>`,
+                    onlineTickets: `<div class="info-card"><strong>🎫 ONLINE RESERVATIONS - MEDICI CHAPEL</strong><br>💰 <strong>Price:</strong> 8-20 €<br>⏰ <strong>Book:</strong> 2-4 weeks in advance<br>🌐 <strong>Official website:</strong> b-ticket.com<br><strong>✅ TIPS:</strong><br>• Book morning slots<br>• Select "Cappelle Medicee"<br>• Arrive 15 min before your time</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Official Website</button>`,
+                    prices: `<div class="info-card"><strong>💰 FLORENCE PRICES</strong><br><strong>🎫 MUSEUMS:</strong><br>• Medici Chapel: 8-20 €<br>• Uffizi Gallery: 20-35 €<br>• Accademia: 12-25 €<br><strong>🏨 PACKAGES:</strong><br>• Cultural (5 days): 620 €<br>• Premium (7 days): 890 €</div>`,
+                    unknown: `<div class="tip-card"><strong>🤔 I didn't fully understand your question.</strong><br>Please ask me about:<br>• <strong>Time</strong> for visits<br>• <strong>Tickets</strong> and reservations<br>• <strong>Travel</strong> plans<br>• <strong>Prices</strong> for museums</div>`
                 }
-                return null;
             },
-            
-            извлечиДата: function(заявка) {
-                const today = new Date();
-                if (заявка.includes('следващата седмица') || заявка.includes('следваща седмица')) {
-                    const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-                    return nextWeek.toISOString().split('T')[0];
+            it: {
+                texts: {
+                    headerTitle: "🎨 GUIDA AI - FIRENZE",
+                    headerSubtitle: "Il tuo compagno di viaggio intelligente",
+                    onlineTickets: "Prenotazioni online per Cappelle Medicee",
+                    timeEstimate: "Quanto tempo per vedere tutti i musei",
+                    travelPlan: "Aiutami a pianificare il viaggio",
+                    prices: "Prezzi per Firenze",
+                    sendButton: "Invia",
+                    placeholder: "Chiedi informazioni su tempo, prenotazioni o pianificazione...",
+                    welcomeMessage: "🤖 Ciao!",
+                    welcomeText: "Sono la tua guida intelligente. Posso aiutarti con: prenotazioni online, pianificazione del tempo, itinerari e prezzi!"
+                },
+                responses: {
+                    timeEstimate: `<div class="info-card"><strong>⏱️ TEMPO STIMATO PER LE VISITE:</strong><br><strong>🎨 MUSEI PRINCIPALI:</strong><br>• Cappelle Medicee: <strong>1-2 ore</strong><br>• Galleria degli Uffizi: <strong>3-4 ore</strong><br>• Accademia (David): <strong>1-2 ore</strong><br><strong>💡 CONSIGLIO:</strong> Distribuisci i musei in giorni diversi e inizia di prima mattina!</div>`,
+                    travelPlan: `<div class="info-card"><strong>🗓️ ITINERARIO DI 3 GIORNI A FIRENZE:</strong><br><strong>📅 GIORNO 1: ARTE RINASCIMENTALE</strong><br>• 09:00 - Galleria degli Uffizi<br>• 14:00 - Pranzo in ristorante locale<br>• 16:00 - Ponte Vecchio<br><strong>📅 GIORNO 2: MICHELANGELO</strong><br>• 08:30 - Accademia (David)<br>• 11:00 - Cappelle Medicee<br>• 18:00 - Tramonto al Piazzale Michelangelo</div>`,
+                    onlineTickets: `<div class="info-card"><strong>🎫 PRENOTAZIONI ONLINE - CAPPELLE MEDICEE</strong><br>💰 <strong>Prezzo:</strong> 8-20 €<br>⏰ <strong>Prenota:</strong> 2-4 settimane prima<br>🌐 <strong>Sito ufficiale:</strong> b-ticket.com<br><strong>✅ CONSIGLI:</strong><br>• Prenota gli slot mattutini<br>• Seleziona "Cappelle Medicee"<br>• Arriva 15 min prima dell'orario</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Sito Ufficiale</button>`,
+                    prices: `<div class="info-card"><strong>💰 PREZZI FIRENZE</strong><br><strong>🎫 MUSEI:</strong><br>• Cappelle Medicee: 8-20 €<br>• Galleria Uffizi: 20-35 €<br>• Accademia: 12-25 €<br><strong>🏨 PACCHETTI:</strong><br>• Culturale (5 giorni): 620 €<br>• Premium (7 giorni): 890 €</div>`,
+                    unknown: `<div class="tip-card"><strong>🤔 Non ho capito completamente la tua domanda.</strong><br>Per favore chiedimi di:<br>• <strong>Tempo</strong> per le visite<br>• <strong>Biglietti</strong> e prenotazioni<br>• <strong>Piani</strong> di viaggio<br>• <strong>Prezzi</strong> per i musei</div>`
                 }
-                if (заявка.includes('утре')) {
-                    const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-                    return tomorrow.toISOString().split('T')[0];
-                }
-                return today.toISOString().split('T')[0];
             },
-            
-            извлечиНощувки: function(заявка) {
-                const match = заявка.match(/(\d+)\s*нощувки?/);
-                return match ? parseInt(match[1]) : 3;
+            es: {
+                texts: {
+                    headerTitle: "🎨 GUÍA AI - FLORENCIA",
+                    headerSubtitle: "Tu compañero de viaje inteligente",
+                    onlineTickets: "Reservas online para Capilla Medici",
+                    timeEstimate: "Cuánto tiempo para ver todos los museos",
+                    travelPlan: "Ayúdame a planificar el viaje",
+                    prices: "Precios para Florencia",
+                    sendButton: "Enviar",
+                    placeholder: "Pregunta sobre tiempo, reservas o planificación...",
+                    welcomeMessage: "🤖 ¡Hola!",
+                    welcomeText: "Soy tu guía inteligente. ¡Puedo ayudarte con: reservas online, planificación de tiempo, rutas y precios!"
+                },
+                responses: {
+                    timeEstimate: `<div class="info-card"><strong>⏱️ ESTIMACIÓN DE TIEMPO PARA VISITAS:</strong><br><strong>🎨 MUSEOS PRINCIPALES:</strong><br>• Capilla Medici: <strong>1-2 horas</strong><br>• Galería Uffizi: <strong>3-4 horas</strong><br>• Academia (David): <strong>1-2 horas</strong><br><strong>💡 CONSEJO:</strong> ¡Distribuye los museos en días diferentes y comienza temprano por la mañana!</div>`,
+                    travelPlan: `<div class="info-card"><strong>🗓️ ITINERARIO DE 3 DÍAS EN FLORENCIA:</strong><br><strong>📅 DÍA 1: ARTE RENACENTISTA</strong><br>• 09:00 - Galería Uffizi<br>• 14:00 - Almuerzo en restaurante local<br>• 16:00 - Ponte Vecchio<br><strong>📅 DÍA 2: MIGUEL ÁNGEL</strong><br>• 08:30 - Academia (David)<br>• 11:00 - Capilla Medici<br>• 18:00 - Atardecer en Piazzale Michelangelo</div>`,
+                    onlineTickets: `<div class="info-card"><strong>🎫 RESERVAS ONLINE - CAPILLA MEDICI</strong><br>💰 <strong>Precio:</strong> 8-20 €<br>⏰ <strong>Reserva:</strong> 2-4 semanas antes<br>🌐 <strong>Sitio oficial:</strong> b-ticket.com<br><strong>✅ CONSEJOS:</strong><br>• Reserva horarios matutinos<br>• Selecciona "Cappelle Medicee"<br>• Llega 15 min antes de tu hora</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Sitio Oficial</button>`,
+                    prices: `<div class="info-card"><strong>💰 PRECIOS FLORENCIA</strong><br><strong>🎫 MUSEOS:</strong><br>• Capilla Medici: 8-20 €<br>• Galería Uffizi: 20-35 €<br>• Academia: 12-25 €<br><strong>🏨 PAQUETES:</strong><br>• Cultural (5 días): 620 €<br>• Premium (7 días): 890 €</div>`,
+                    unknown: `<div class="tip-card"><strong>🤔 No entendí completamente tu pregunta.</strong><br>Por favor pregúntame sobre:<br>• <strong>Tiempo</strong> para visitas<br>• <strong>Entradas</strong> y reservas<br>• <strong>Planes</strong> de viaje<br>• <strong>Precios</strong> para museos</div>`
+                }
             },
-            
-            извлечиТипПътуване: function(заявка) {
-                if (заявка.includes('връщане') || заявка.includes('return') || заявка.includes('отиване и връщане')) {
-                    return 'return';
+            fr: {
+                texts: {
+                    headerTitle: "🎨 GUIDE AI - FLORENCE",
+                    headerSubtitle: "Votre compagnon de voyage intelligent",
+                    onlineTickets: "Réservations en ligne pour Chapelle Medici",
+                    timeEstimate: "Temps nécessaire pour voir tous les musées",
+                    travelPlan: "Aidez-moi à planifier mon voyage",
+                    prices: "Prix pour Florence",
+                    sendButton: "Envoyer",
+                    placeholder: "Demandez sur le temps, les réservations ou la planification...",
+                    welcomeMessage: "🤖 Bonjour!",
+                    welcomeText: "Je suis votre guide intelligent. Je peux vous aider avec: réservations en ligne, planification du temps, itinéraires et prix!"
+                },
+                responses: {
+                    timeEstimate: `<div class="info-card"><strong>⏱️ ESTIMATION DU TEMPS DE VISITE:</strong><br><strong>🎨 MUSÉES PRINCIPAUX:</strong><br>• Chapelle Medici: <strong>1-2 heures</strong><br>• Galerie des Offices: <strong>3-4 heures</strong><br>• Académie (David): <strong>1-2 heures</strong><br><strong>💡 CONSEIL:</strong> Répartissez les musées sur différents jours et commencez tôt le matin!</div>`,
+                    travelPlan: `<div class="info-card"><strong>🗓️ ITINÉRAIRE DE 3 JOURS À FLORENCE:</strong><br><strong>📅 JOUR 1: ART RENAISSANCE</strong><br>• 09:00 - Galerie des Offices<br>• 14:00 - Déjeuner dans un restaurant local<br>• 16:00 - Ponte Vecchio<br><strong>📅 JOUR 2: MICHEL-ANGE</strong><br>• 08:30 - Académie (David)<br>• 11:00 - Chapelle Medici<br>• 18:00 - Coucher de soleil au Piazzale Michelangelo</div>`,
+                    onlineTickets: `<div class="info-card"><strong>🎫 RÉSERVATIONS EN LIGNE - CHAPELLE MEDICI</strong><br>💰 <strong>Prix:</strong> 8-20 €<br>⏰ <strong>Réservez:</strong> 2-4 semaines à l'avance<br>🌐 <strong>Site officiel:</strong> b-ticket.com<br><strong>✅ CONSEILS:</strong><br>• Réservez les créneaux matinaux<br>• Sélectionnez "Cappelle Medicee"<br>• Arrivez 15 min avant votre heure</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Site Officiel</button>`,
+                    prices: `<div class="info-card"><strong>💰 PRIX FLORENCE</strong><br><strong>🎫 MUSÉES:</strong><br>• Chapelle Medici: 8-20 €<br>• Galerie des Offices: 20-35 €<br>• Académie: 12-25 €<br><strong>🏨 FORFAITS:</strong><br>• Culturel (5 jours): 620 €<br>• Premium (7 jours): 890 €</div>`,
+                    unknown: `<div class="tip-card"><strong>🤔 Je n'ai pas bien compris votre question.</strong><br>Veuillez me demander :<br>• <strong>Temps</strong> pour les visites<br>• <strong>Billets</strong> et réservations<br>• <strong>Plans</strong> de voyage<br>• <strong>Prix</strong> pour les musées</div>`
                 }
-                return 'one-way';
-            },
-            
-            извлечиПриоритет: function(заявка) {
-                if (заявка.includes('най-евтини') || заявка.includes('евтини') || заявка.includes('ниска цена')) {
-                    return 'price';
-                }
-                if (заявка.includes('бърз') || заявка.includes('скоро') || заявка.includes('срочно')) {
-                    return 'speed';
-                }
-                return 'balanced';
-            },
-            
-            извлечиСпецифики: function(заявка) {
-                const специфики = [];
-                if (заявка.includes('настаняване') || заявка.includes('хотел') || заявка.includes('нощувки')) {
-                    специфики.push('hotel');
-                }
-                if (заявка.includes('полет') || заявка.includes('билет') || заявка.includes('самолет')) {
-                    специфики.push('flight');
-                }
-                if (заявка.includes('транспорт') || заявка.includes('кола') || заявка.includes('transfer')) {
-                    специфики.push('transport');
-                }
-                return специфики;
             }
         };
 
-        // 🎯 ПРОФЕСИОНАЛЕН AI С ИНТЕЛИГЕНТЕН PARSER
-        const ProfessionalAI = {
-            обработиЗаявка: function(заявка) {
-                // 🎯 ИНТЕЛИГЕНТЕН АНАЛИЗ НА ЗАЯВКАТА
-                const анализ = IntelligentParser.анализирайЗаявка(заявка);
-                
-                if (анализ.дестинация) {
-                    return this.генерирайКомплексенОтговор(анализ);
+        // ПЕРСОНАЛИЗАЦИЯ - ПЪЛНА ИМПЛЕМЕНТАЦИЯ
+        let userProfile = {
+            searchHistory: [],
+            preferences: {
+                travelType: null,
+                budget: null,
+                interests: [],
+                season: null
+            },
+            favoriteCities: [],
+            lastSearches: []
+        };
+
+        const enhancedCityDatabase = {
+            "рим": {
+                name: "Рим",
+                keywords: ["рим", "roma", "rome"],
+                categories: ["history", "culture", "romantic", "food", "architecture"],
+                tags: ["античен", "религиозен", "архитектура", "вкусна храна", "романтичен"],
+                budgetLevel: "medium",
+                bestSeasons: ["spring", "autumn"],
+                familyFriendly: true,
+                romanticScore: 9,
+                info: {
+                    mainAttractions: ["Колизеум", "Ватикан", "Пантеон", "Фонтан ди Треви"],
+                    museums: ["Ватикански музеи", "Музеи на Капитолия", "Галерия Боргезе"],
+                    prices: { museums: "15-25€", transport: "7€/дневен билет", food: "15-30€ за хранене" },
+                    timeNeeded: "4-5 дни",
+                    bestTime: "Март-Май, Септември-Октомври"
                 }
-                
-                return this.общОтговор(заявка);
             },
-            
-            генерирайКомплексенОтговор: function(анализ) {
-                const дестинацияИме = this.вземиИмеНаДестинация(анализ.дестинация);
-                
-                let отговор = `🎯 **КОМПЛЕКСНА ОФЕРТА: СОФИЯ - ${дестинацияИме}**\n\n`;
-                
-                // ✈️ ПОЛЕТНА ИНФОРМАЦИЯ
-                отговор += `✈️ **ПОЛЕТИ:**\n`;
-                const полети = this.вземиПолетнаИнформация(анализ.дестинация, анализ.приоритет);
-                полети.forEach(полет => отговор += `${полет}\n`);
-                
-                // 🏨 ХОТЕЛНА ИНФОРМАЦИЯ  
-                if (анализ.специфики.includes('hotel')) {
-                    отговор += `\n🏨 **НАСТАНЯВАНЕ (${анализ.нощувки} нощувки):**\n`;
-                    const хотели = this.вземиХотелнаИнформация(анализ.дестинация, анализ.нощувки);
-                    хотели.forEach(хотел => отговор += `${хотел}\n`);
+            "париж": {
+                name: "Париж",
+                keywords: ["париж", "paris"],
+                categories: ["romantic", "culture", "shopping", "food", "art"],
+                tags: ["романтичен", "мода", "изкуство", "гастрономия", "луксозен"],
+                budgetLevel: "luxury",
+                bestSeasons: ["spring", "summer"],
+                familyFriendly: true,
+                romanticScore: 10,
+                info: {
+                    mainAttractions: ["Айфелова кула", "Лувър", "Нотр Дам", "Триумфална арка"],
+                    museums: ["Лувър", "Музей д'Орсе", "Център Помпиду"],
+                    prices: { museums: "12-25€", transport: "12€/дневен билет", food: "20-40€ за хранене" },
+                    timeNeeded: "4-5 дни",
+                    bestTime: "Април-Юни, Септември-Октомври"
                 }
-                
-                // 💡 СЪВЕТИ БАЗИРАНИ НА АНАЛИЗА
-                отговор += `\n💡 **ПЕРСОНАЛИЗИРАНИ СЪВЕТИ:**\n`;
-                отговор += this.генерирайСъвети(анализ);
-                
-                // 📞 CALL TO ACTION
-                отговор += `\n📞 **ЗА ТОЧНИ ЦЕНИ И РЕЗЕРВАЦИЯ:**\n`;
-                отговор += `Обадете се на Биляна: +359 885 07 89 80\n\n`;
-                отговор += `🎯 Ще ви подготвим пълна оферта с точни цени!`;
-                
-                return отговор;
             },
-            
-            вземиИмеНаДестинация: function(код) {
-                const имена = {
-                    'DXB': 'ДУБАЙ', 'IST': 'ИСТАНБУЛ', 'ROM': 'РИМ',
-                    'PAR': 'ПАРИЖ', 'MAD': 'МАДРИД', 'LON': 'ЛОНДОН'
-                };
-                return имена[код] || код;
-            },
-            
-            вземиПолетнаИнформация: function(дестинация, приоритет) {
-                const полетниДанни = {
-                    'DXB': {
-                        price: ["✈️ FZ 789 • 22:15-05:30+1 • от 359 лв. (най-евтин)", "✈️ EK 142 • 09:30-16:45 • от 399 лв."],
-                        speed: ["✈️ EK 142 • 09:30-16:45 • от 399 лв. (най-бърз)", "✈️ FZ 789 • 22:15-05:30+1 • от 359 лв."],
-                        balanced: ["✈️ EK 142 • 09:30-16:45 • от 399 лв.", "✈️ FZ 789 • 22:15-05:30+1 • от 359 лв."]
-                    },
-                    'IST': {
-                        price: ["✈️ W6 4567 • 14:20-16:45 • от 79 лв. (най-евтин)", "✈️ TK 1023 • 08:00-10:30 • от 89 лв."],
-                        speed: ["✈️ TK 1023 • 08:00-10:30 • от 89 лв. (най-бърз)", "✈️ W6 4567 • 14:20-16:45 • от 79 лв."],
-                        balanced: ["✈️ TK 1023 • 08:00-10:30 • от 89 лв.", "✈️ W6 4567 • 14:20-16:45 • от 79 лв."]
-                    },
-                    'ROM': {
-                        price: ["✈️ W6 4321 • 18:00-19:45 • от 59 лв. (най-евтин)", "✈️ FR 2345 • 06:45-08:30 • от 69 лв."],
-                        speed: ["✈️ FR 2345 • 06:45-08:30 • от 69 лв. (най-бърз)", "✈️ W6 4321 • 18:00-19:45 • от 59 лв."],
-                        balanced: ["✈️ FR 2345 • 06:45-08:30 • от 69 лв.", "✈️ W6 4321 • 18:00-19:45 • от 59 лв."]
-                    }
-                };
-                
-                return полетниДанни[дестинация]?.[приоритет] || ["✈️ Проверяваме наличности..."];
-            },
-            
-            вземиХотелнаИнформация: function(дестинация, нощувки) {
-                const хотелниДанни = {
-                    'DXB': [
-                        `🏨 Rove City Centre • 3* • от ${280 * нощувки} лв. за ${нощувки} нощувки`,
-                        `🏨 Millennium Plaza • 4* • от ${420 * нощувки} лв. за ${нощувки} нощувки`,
-                        `🏨 Address Downtown • 5* • от ${680 * нощувки} лв. за ${нощувки} нощувки`
-                    ],
-                    'IST': [
-                        `🏨 The President • 4* • от ${180 * нощувки} лв. за ${нощувки} нощувки`,
-                        `🏨 CVK Hotel • 5* • от ${320 * нощувки} лв. за ${нощувки} нощувки`
-                    ],
-                    'ROM': [
-                        `🏨 Hotel Artemide • 4* • от ${150 * нощувки} лв. за ${нощувки} нощувки`,
-                        `🏨 The St. Regis • 5* • от ${400 * нощувки} лв. за ${нощувки} нощувки`
-                    ]
-                };
-                
-                return хотелниДанни[дестинация] || [`🏨 Намираме подходящи хотели...`];
-            },
-            
-            генерирайСъвети: function(анализ) {
-                let съвети = "";
-                
-                if (анализ.приоритет === 'price') {
-                    съвети += "💰 **За най-ниски цени:** Пътувайте във вторник или сряда\n";
+            "барселона": {
+                name: "Барселона",
+                keywords: ["барселона", "barcelona"],
+                categories: ["beach", "culture", "nightlife", "architecture", "family"],
+                tags: ["плаж", "Гауди", "нощен живот", "модернизъм", "семеен"],
+                budgetLevel: "medium",
+                bestSeasons: ["spring", "summer", "autumn"],
+                familyFriendly: true,
+                romanticScore: 7,
+                info: {
+                    mainAttractions: ["Саграда Фамилия", "Парк Гуел", "Ла Рамбла", "Готически квартал"],
+                    museums: ["Музей Пикасо", "Фондация Миро", "MNAC"],
+                    prices: { museums: "10-20€", transport: "10€/дневен билет", food: "15-30€ за хранене" },
+                    timeNeeded: "3-4 дни",
+                    bestTime: "Май-Юни, Септември"
                 }
-                
-                if (анализ.нощувки > 5) {
-                    съвети += "🏨 **За дълги престои:** Помислете за апартамент вместо хотел\n";
-                }
-                
-                съвети += "🎯 **Общо:** Резервирайте 2-3 седмици предварително за най-добри оферти\n";
-                
-                return съвети;
             },
-            
-            общОтговор: function(заявка) {
-                return `💼 **ПРОФЕСИОНАЛЕН ОТГОВОР:**\n\nРазбрах вашата заявка: "${заявка}"\n\n🎯 За да ви дам точна информация, моля уточнете:\n• Конкретна дестинация\n• Дати на пътуване\n• Брой пътници\n• Предпочитан бюджет\n\n📞 Или се обадете директно на Биляна: +359 885 07 89 80\n\n💫 Ще ви осигурим най-добрите оферти!`;
+            "прага": {
+                name: "Прага",
+                keywords: ["прага", "prague", "praha"],
+                categories: ["history", "culture", "budget", "romantic"],
+                tags: ["исторически", "евтин", "романтичен", "архитектура"],
+                budgetLevel: "budget",
+                bestSeasons: ["spring", "autumn"],
+                familyFriendly: true,
+                romanticScore: 8,
+                info: {
+                    mainAttractions: ["Пражки замък", "Карлов мост", "Астрономически часовник", "Староместки площад"],
+                    museums: ["Национален музей", "Музей на комунизма", "Музей Кампа"],
+                    prices: { museums: "8-15€", transport: "5€/дневен билет", food: "10-20€ за хранене" },
+                    timeNeeded: "3-4 дни",
+                    bestTime: "Април-Май, Септември-Октомври"
+                }
+            },
+            "будапеща": {
+                name: "Будапеща",
+                keywords: ["будапеща", "budapest"],
+                categories: ["history", "culture", "budget", "romantic", "spa"],
+                tags: ["исторически", "евтин", "романтичен", "спа", "термални бани"],
+                budgetLevel: "budget",
+                bestSeasons: ["spring", "autumn"],
+                familyFriendly: true,
+                romanticScore: 8,
+                info: {
+                    mainAttractions: ["Парламент", "Рибарски бастион", "Будайски замък", "Цепен мост"],
+                    museums: ["Национален музей", "Музей на изкуствата", "Дом на террора"],
+                    prices: { museums: "8-15€", transport: "5€/дневен билет", food: "10-20€ за хранене" },
+                    timeNeeded: "3-4 дни",
+                    bestTime: "Април-Май, Септември-Октомври"
+                }
+            },
+            "лисабон": {
+                name: "Лисабон",
+                keywords: ["лисабон", "lisbon", "lisboa"],
+                categories: ["culture", "beach", "budget", "food", "hills"],
+                tags: ["хълмист", "евтин", "плаж", "вкусна храна", "трамваи"],
+                budgetLevel: "budget",
+                bestSeasons: ["spring", "autumn"],
+                familyFriendly: true,
+                romanticScore: 7,
+                info: {
+                    mainAttractions: ["Замък Сао Хорхе", "Беленска кула", "Монастир на Йеронимитите", "Алфама"],
+                    museums: ["Музей на карети", "Музей на изкуството", "MAAT"],
+                    prices: { museums: "8-15€", transport: "6€/дневен билет", food: "12-25€ за хранене" },
+                    timeNeeded: "3-4 дни",
+                    bestTime: "Март-Май, Септември-Октомври"
+                }
+            },
+            "ница": {
+                name: "Ница",
+                keywords: ["ница", "nice"],
+                categories: ["beach", "romantic", "luxury", "french_riviera"],
+                tags: ["плаж", "романтичен", "луксозен", "Лазурен бряг", "френска ривиера"],
+                budgetLevel: "luxury",
+                bestSeasons: ["spring", "summer"],
+                familyFriendly: true,
+                romanticScore: 9,
+                info: {
+                    mainAttractions: ["Английска набережна", "Стари град", "Замъкова хълм", "Марк Шагал музей"],
+                    museums: ["Музей на изкуствата", "МАМАК", "Музей Матис"],
+                    prices: { museums: "10-15€", transport: "5€/дневен", food: "20-40€" },
+                    timeNeeded: "2-3 дни",
+                    bestTime: "Май-Септември"
+                }
+            },
+            "венеция": {
+                name: "Венеция",
+                keywords: ["венеция", "venice", "venezia"],
+                categories: ["romantic", "culture", "unique", "canals"],
+                tags: ["романтичен", "канали", "уникален", "гондоли", "луксозен"],
+                budgetLevel: "luxury",
+                bestSeasons: ["spring", "autumn"],
+                familyFriendly: true,
+                romanticScore: 10,
+                info: {
+                    mainAttractions: ["Площад Сан Марко", "Дворец Дожете", "Мост Вздихвания", "Канали"],
+                    museums: ["Галерия Академия", "Музей на стъклото", "Пеги Гугенхайм колекция"],
+                    prices: { museums: "15-25€", transport: "20€/водно такси", food: "25-50€" },
+                    timeNeeded: "2-3 дни",
+                    bestTime: "Април-Май, Септември-Октомври"
+                }
+            },
+            "амстердам": {
+                name: "Амстердам",
+                keywords: ["амстердам", "amsterdam"],
+                categories: ["culture", "canals", "nightlife", "art", "bicycles"],
+                tags: ["канали", "велосипеди", "нощен живот", "изкуство", "толерантен"],
+                budgetLevel: "medium",
+                bestSeasons: ["spring", "summer"],
+                familyFriendly: true,
+                romanticScore: 7,
+                info: {
+                    mainAttractions: ["Канали", "Райксмузей", "Ан Франк къща", "Дам площад"],
+                    museums: ["Райксмузей", "Ван Гог музей", "Ан Франк къща"],
+                    prices: { museums: "15-25€", transport: "8€/дневен билет", food: "15-30€ за хранене" },
+                    timeNeeded: "3-4 дни",
+                    bestTime: "Април-Октомври"
+                }
             }
         };
 
-        // 🤖 NOVAK AI - С ПРЕПРАТКА НА КОМПЛЕКСНИ ЗАЯВКИ КЪМ PROFESSIONAL AI
-        const NovakAI = {
-            обработиЗаявка: function(заявка) {
-                // 🎯 АКО ЗАЯВКАТА Е КОМПЛЕКСНА - ПРЕПРАТИ Я КЪМ PROFESSIONAL AI
-                const анализ = IntelligentParser.анализирайЗаявка(заявка);
-                if (анализ.дестинация) {
-                    return ProfessionalAI.обработиЗаявка(заявка);
-                }
-                
-                // 🎯 АКО Е ПРОСТА ЗАЯВКА - ОБРАБОТИ Я С NOVAK AI
-                const отговори = {
-                    'здрасти': "🎉 Здравей! Радвам се да те видя! Искаш ли да планираме приключение?",
-                    'дестинации': "🏝️ Препоръчвам: Истанбул, Дубай, Рим, Париж, Лондон!",
-                    'бюджет': "💰 Имам идеи за всеки бюджет - от 500лв до лукс!",
-                    'съвети': "🎯 Резервирай предварително и пътувай извън сезона!",
-                    'default': "🤔 Интересуваш ли се от дестинации, бюджет или съвети?"
-                };
-                
-                заявка = заявка.toLowerCase();
-                for (let ключ in отговори) {
-                    if (заявка.includes(ключ)) return отговори[ключ];
-                }
-                return отговори.default;
-            }
-        };
+        let currentLanguage = translations.bg;
 
-        // 🎯 ОСНОВНИ ФУНКЦИИ
-        function switchMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.${mode}-mode`).classList.add('active');
-            document.getElementById('chatTitle').textContent = mode === 'novak' ? '💬 Чат с Новак AI' : '💼 Професионален консултант';
-            document.getElementById('novakActions').classList.toggle('hidden', mode !== 'novak');
-            document.getElementById('proActions').classList.toggle('hidden', mode === 'novak');
+        function changeLanguage(lang) {
+            currentLanguage = translations[lang];
             
-            const message = mode === 'novak' ? 
-                "🤖 Здрасти! Аз съм Новак - вашият AI консултант за пътувания! 🎯" : 
-                "💼 Добър ден! Професионален travel консултант на линия! ✈️\n\nМога да ви помогна с полети, хотели и пътувания!\n\n📞 За резервации: +359 885 07 89 80";
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
             
-            addMessage(message, mode === 'novak' ? 'ai' : 'pro');
+            const targetBtn = document.querySelector(`.lang-btn[onclick="changeLanguage('${lang}')"]`);
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+            }
+            
+            document.getElementById('header-title').textContent = currentLanguage.texts.headerTitle;
+            document.getElementById('header-subtitle').textContent = currentLanguage.texts.headerSubtitle;
+            document.getElementById('userInput').placeholder = currentLanguage.texts.placeholder;
+            document.getElementById('send-button').textContent = currentLanguage.texts.sendButton;
+            document.getElementById('welcome-message').textContent = currentLanguage.texts.welcomeMessage;
+            document.getElementById('welcome-text').textContent = currentLanguage.texts.welcomeText;
         }
 
-        function handleKeyPress(event) { 
-            if (event.key === 'Enter') sendMessage(); 
+        function getAIResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            updateUserProfile(lowerMessage);
+            
+            if (lowerMessage.includes('подобни на') || lowerMessage.includes('similar to') || lowerMessage.includes('като')) {
+                return getSimilarCitiesResponse(message);
+            }
+            
+            if (lowerMessage.includes('препоръчай') || lowerMessage.includes('recommend') || lowerMessage.includes('предложи')) {
+                return getPersonalizedRecommendations(message);
+            }
+            
+            if (lowerMessage.includes('евтино') || lowerMessage.includes('бюджет') || lowerMessage.includes('cheap') || lowerMessage.includes('икономично')) {
+                return getBudgetRecommendations();
+            }
+            
+            if (lowerMessage.includes('луксоз') || lowerMessage.includes('luxury') || lowerMessage.includes('скъп')) {
+                return getLuxuryRecommendations();
+            }
+            
+            if (lowerMessage.includes('романтич') || lowerMessage.includes('romantic') || lowerMessage.includes('меден месец')) {
+                return getRomanticRecommendations();
+            }
+            
+            if (lowerMessage.includes('плаж') || lowerMessage.includes('beach') || lowerMessage.includes('море')) {
+                return getBeachRecommendations();
+            }
+            
+            if (lowerMessage.includes('истори') || lowerMessage.includes('history') || lowerMessage.includes('култур')) {
+                return getCulturalRecommendations();
+            }
+            
+            if (lowerMessage.includes('лято') || lowerMessage.includes('summer')) {
+                return getSeasonalRecommendations('summer');
+            }
+            
+            if (lowerMessage.includes('зима') || lowerMessage.includes('winter')) {
+                return getSeasonalRecommendations('winter');
+            }
+            
+            if (lowerMessage.includes('пролет') || lowerMessage.includes('spring')) {
+                return getSeasonalRecommendations('spring');
+            }
+            
+            if (lowerMessage.includes('есен') || lowerMessage.includes('autumn')) {
+                return getSeasonalRecommendations('autumn');
+            }
+            
+            if (lowerMessage.includes('история') || lowerMessage.includes('history') || lowerMessage.includes('търсения')) {
+                return getSearchHistory();
+            }
+            
+            for (const [cityKey, cityData] of Object.entries(enhancedCityDatabase)) {
+                if (cityData.keywords.some(keyword => lowerMessage.includes(keyword))) {
+                    userProfile.searchHistory.push(cityData.name);
+                    userProfile.lastSearches.unshift(cityData.name);
+                    if (userProfile.lastSearches.length > 5) userProfile.lastSearches.pop();
+                    return generateCityResponse(cityData);
+                }
+            }
+            
+            if (lowerMessage.includes('флоренция') || lowerMessage.includes('florence') || lowerMessage.includes('firenze')) {
+                if (lowerMessage.includes('време') || lowerMessage.includes('time') || lowerMessage.includes('колко')) {
+                    return currentLanguage.responses.timeEstimate;
+                }
+                else if (lowerMessage.includes('план') || lowerMessage.includes('plan')) {
+                    return currentLanguage.responses.travelPlan;
+                }
+                else if (lowerMessage.includes('билет') || lowerMessage.includes('ticket')) {
+                    return currentLanguage.responses.onlineTickets;
+                }
+                else if (lowerMessage.includes('цен') || lowerMessage.includes('price')) {
+                    return currentLanguage.responses.prices;
+                }
+                else {
+                    return generateCityResponse({
+                        name: "Флоренция",
+                        info: {
+                            mainAttractions: ["Капела Медичи", "Галерия Уфици", "Понте Векьо", "Пиацале Микеланджело"],
+                            museums: ["Галерия Уфици", "Академия", "Палацо Пити"],
+                            prices: { museums: "8-35€", transport: "5€/дневен билет", food: "15-30€ за хранене" },
+                            timeNeeded: "3-4 дни",
+                            bestTime: "Април-Май, Септември-Октомври"
+                        }
+                    });
+                }
+            }
+            
+            return getPersonalizedFallback();
         }
 
+        function updateUserProfile(message) {
+            if (message.includes('евтино') || message.includes('бюджет') || message.includes('икономично')) {
+                userProfile.preferences.budget = 'budget';
+            } else if (message.includes('луксоз') || message.includes('скъп')) {
+                userProfile.preferences.budget = 'luxury';
+            }
+            
+            if (message.includes('романтич') || message.includes('меден месец')) {
+                userProfile.preferences.travelType = 'romantic';
+            } else if (message.includes('плаж') || message.includes('море')) {
+                userProfile.preferences.travelType = 'beach';
+            } else if (message.includes('истори') || message.includes('култур')) {
+                userProfile.preferences.travelType = 'culture';
+            }
+            
+            if (message.includes('лято')) userProfile.preferences.season = 'summer';
+            if (message.includes('зима')) userProfile.preferences.season = 'winter';
+            if (message.includes('пролет')) userProfile.preferences.season = 'spring';
+            if (message.includes('есен')) userProfile.preferences.season = 'autumn';
+        }
+
+        function getSimilarCitiesResponse(message) {
+            const targetCity = findCityInMessage(message);
+            if (targetCity) {
+                const similarCities = findSimilarCities(targetCity);
+                return `
+                    <div class="info-card">
+                        <strong>🔍 ПОДОБНИ НА ${targetCity.name.toUpperCase()}:</strong><br><br>
+                        ${similarCities.map(city => `
+                            <div style="margin-bottom: 10px;">
+                                <strong>🏙️ ${city.name}</strong><br>
+                                <span style="color: #666; font-size: 10px;">${city.similarity}</span><br>
+                                <span style="font-size: 10px;">🎯 ${city.info.mainAttractions.slice(0, 2).join(', ')}</span>
+                            </div>
+                        `).join('')}
+                        <br><strong>💡 Съвет:</strong> Тези градове предлагат подобни преживявания!
+                    </div>
+                `;
+            }
+            return currentLanguage.responses.unknown;
+        }
+
+        function getPersonalizedRecommendations(message) {
+            let recommendations = [];
+            
+            if (message.includes('меден месец') || message.includes('романтично')) {
+                recommendations = getRomanticCities();
+            } else if (message.includes('семейно') || message.includes('деца')) {
+                recommendations = getFamilyFriendlyCities();
+            } else if (message.includes('плаж') || message.includes('море')) {
+                recommendations = getBeachCities();
+            } else if (message.includes('истори') || message.includes('култур')) {
+                recommendations = getCulturalCities();
+            } else {
+                recommendations = getIntelligentRecommendations();
+            }
+            
+            return `
+                <div class="info-card">
+                    <strong>🎯 ПЕРСОНАЛИЗИРАНИ ПРЕПОРЪКИ:</strong><br><br>
+                    ${recommendations.slice(0, 3).map((city, index) => `
+                        <div style="margin-bottom: 12px;">
+                            <strong>${getMedal(index)} ${city.name}</strong><br>
+                            <span style="color: #666; font-size: 10px;">${city.reason}</span><br>
+                            <span style="font-size: 10px;">💰 Бюджет: ${city.info.prices.food} | ⏱️ ${city.info.timeNeeded}</span>
+                        </div>
+                    `).join('')}
+                    <br><strong>💡 Съвет:</strong> Избери град според твоите интереси и бюджет!
+                </div>
+            `;
+        }
+
+        function getBudgetRecommendations() {
+            const budgetCities = Object.values(enhancedCityDatabase)
+                .filter(city => city.budgetLevel === 'budget')
+                .slice(0, 4);
+            
+            return `
+                <div class="info-card">
+                    <strong>💰 БЮДЖЕТНИ ГРАДОВЕ:</strong><br><br>
+                    ${budgetCities.map(city => `
+                        <div style="margin-bottom: 10px;">
+                            <strong>🏙️ ${city.name}</strong><br>
+                            <span style="font-size: 10px;">💵 Хранене: ${city.info.prices.food} | 🚌 Транспорт: ${city.info.prices.transport}</span><br>
+                            <span style="font-size: 10px;">🎯 ${city.info.mainAttractions.slice(0, 2).join(', ')}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function getLuxuryRecommendations() {
+            const luxuryCities = Object.values(enhancedCityDatabase)
+                .filter(city => city.budgetLevel === 'luxury')
+                .slice(0, 4);
+            
+            return `
+                <div class="info-card">
+                    <strong>💎 ЛУКСОЗНИ ГРАДОВЕ:</strong><br><br>
+                    ${luxuryCities.map(city => `
+                        <div style="margin-bottom: 10px;">
+                            <strong>🏙️ ${city.name}</strong><br>
+                            <span style="font-size: 10px;">💵 Хранене: ${city.info.prices.food} | 🚖 Транспорт: ${city.info.prices.transport}</span><br>
+                            <span style="font-size: 10px;">🎯 ${city.info.mainAttractions.slice(0, 2).join(', ')}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function getRomanticRecommendations() {
+            const romanticCities = Object.values(enhancedCityDatabase)
+                .filter(city => city.categories.includes('romantic'))
+                .sort((a, b) => b.romanticScore - a.romanticScore)
+                .slice(0, 4);
+            
+            return `
+                <div class="info-card">
+                    <strong>💖 РОМАНТИЧНИ ГРАДОВЕ:</strong><br><br>
+                    ${romanticCities.map(city => `
+                        <div style="margin-bottom: 10px;">
+                            <strong>🏙️ ${city.name}</strong><br>
+                            <span style="font-size: 10px;">❤️ Романтичен рейтинг: ${city.romanticScore}/10</span><br>
+                            <span style="font-size: 10px;">🎯 ${city.info.mainAttractions.slice(0, 2).join(', ')}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function getBeachRecommendations() {
+            const beachCities = Object.values(enhancedCityDatabase)
+                .filter(city => city.categories.includes('beach'))
+                .slice(0, 4);
+            
+            return `
+                <div class="info-card">
+                    <strong>🏖️ ПЛАЖНИ ГРАДОВЕ:</strong><br><br>
+                    ${beachCities.map(city => `
+                        <div style="margin-bottom: 10px;">
+                            <strong>🏙️ ${city.name}</strong><br>
+                            <span style="font-size: 10px;">🌊 Плажна дестинация</span><br>
+                            <span style="font-size: 10px;">🎯 ${city.info.mainAttractions.slice(0, 2).join(', ')}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function getCulturalRecommendations() {
+            const culturalCities = Object.values(enhancedCityDatabase)
+                .filter(city => city.categories.includes('culture') || city.categories.includes('history'))
+                .slice(0, 4);
+            
+            return `
+                <div class="info-card">
+                    <strong>🎨 КУЛТУРНИ ГРАДОВЕ:</strong><br><br>
+                    ${culturalCities.map(city => `
+                        <div style="margin-bottom: 10px;">
+                            <strong>🏙️ ${city.name}</strong><br>
+                            <span style="font-size: 10px;">🏛️ Културно наследство</span><br>
+                            <span style="font-size: 10px;">🎯 ${city.info.mainAttractions.slice(0, 2).join(', ')}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function getSeasonalRecommendations(season) {
+            const seasonalCities = Object.values(enhancedCityDatabase)
+                .filter(city => city.bestSeasons.includes(season))
+                .slice(0, 4);
+            
+            const seasonNames = {
+                'summer': 'лято',
+                'winter': 'зима', 
+                'spring': 'пролет',
+                'autumn': 'есен'
+            };
+            
+            return `
+                <div class="info-card">
+                    <strong>🌤️ ГРАДОВЕ ЗА ${seasonNames[season].toUpperCase()}:</strong><br><br>
+                    ${seasonalCities.map(city => `
+                        <div style="margin-bottom: 10px;">
+                            <strong>🏙️ ${city.name}</strong><br>
+                            <span style="font-size: 10px;">📅 Идеален сезон: ${city.info.bestTime}</span><br>
+                            <span style="font-size: 10px;">🎯 ${city.info.mainAttractions.slice(0, 2).join(', ')}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function findCityInMessage(message) {
+            for (const [cityKey, cityData] of Object.entries(enhancedCityDatabase)) {
+                if (cityData.keywords.some(keyword => message.includes(keyword))) {
+                    return cityData;
+                }
+            }
+            return null;
+        }
+
+        function findSimilarCities(targetCity) {
+            return Object.values(enhancedCityDatabase)
+                .filter(city => city.name !== targetCity.name)
+                .map(city => {
+                    const commonCategories = city.categories.filter(cat => 
+                        targetCity.categories.includes(cat)
+                    ).length;
+                    const similarity = `${commonCategories} общи категории`;
+                    return { ...city, similarity };
+                })
+                .sort((a, b) => {
+                    const aCommon = a.categories.filter(cat => targetCity.categories.includes(cat)).length;
+                    const bCommon = b.categories.filter(cat => targetCity.categories.includes(cat)).length;
+                    return bCommon - aCommon;
+                })
+                .slice(0, 3);
+        }
+
+        function getRomanticCities() {
+            return Object.values(enhancedCityDatabase)
+                .filter(city => city.categories.includes('romantic'))
+                .sort((a, b) => b.romanticScore - a.romanticScore)
+                .slice(0, 3)
+                .map(city => ({
+                    ...city,
+                    reason: `Романтичен рейтинг: ${city.romanticScore}/10 - идеален за двойки`
+                }));
+        }
+
+        function getBeachCities() {
+            return Object.values(enhancedCityDatabase)
+                .filter(city => city.categories.includes('beach'))
+                .slice(0, 3)
+                .map(city => ({
+                    ...city,
+                    reason: `Плажна дестинация - перфектна за релакс и слънце`
+                }));
+        }
+
+        function getCulturalCities() {
+            return Object.values(enhancedCityDatabase)
+                .filter(city => city.categories.includes('culture') || city.categories.includes('history'))
+                .slice(0, 3)
+                .map(city => ({
+                    ...city,
+                    reason: `Богато културно наследство - музеи и исторически паметници`
+                }));
+        }
+
+        function getFamilyFriendlyCities() {
+            return Object.values(enhancedCityDatabase)
+                .filter(city => city.familyFriendly)
+                .slice(0, 3)
+                .map(city => ({
+                    ...city,
+                    reason: `Семейно приятелски - подходящ за деца и родители`
+                }));
+        }
+
+        function getIntelligentRecommendations() {
+            let cities = Object.values(enhancedCityDatabase);
+            
+            if (userProfile.preferences.budget) {
+                cities = cities.filter(city => city.budgetLevel === userProfile.preferences.budget);
+            }
+            
+            if (userProfile.preferences.travelType === 'romantic') {
+                cities = cities.filter(city => city.categories.includes('romantic'))
+                             .sort((a, b) => b.romanticScore - a.romanticScore);
+            }
+            
+            if (userProfile.lastSearches.length > 0) {
+                const lastCityName = userProfile.lastSearches[0];
+                const lastCity = cities.find(city => city.name === lastCityName);
+                if (lastCity) {
+                    cities = findSimilarCities(lastCity);
+                }
+            }
+            
+            return cities.slice(0, 3).map(city => ({
+                ...city,
+                reason: `Препоръчано въз основа на вашите предпочитания`
+            }));
+        }
+
+        function getMedal(index) {
+            const medals = ["🥇", "🥈", "🥉"];
+            return medals[index] || "⭐";
+        }
+
+        function getSearchHistory() {
+            if (userProfile.lastSearches.length === 0) {
+                return `<div class="tip-card"><strong>📊 Все още нямате история на търсенията.</strong><br>Започнете да търсите градове!</div>`;
+            }
+            
+            return `
+                <div class="info-card">
+                    <strong>📊 ИСТОРИЯ НА ТЪРСЕНЕТА:</strong><br><br>
+                    ${userProfile.lastSearches.map((city, index) => `
+                        <strong>${index + 1}. ${city}</strong>
+                    `).join('<br>')}
+                    <br><br><strong>💡 Съвет:</strong> Питай "подобни на [град]" за свързани препоръки!
+                </div>
+            `;
+        }
+
+        function generateCityResponse(cityData) {
+            return `
+                <div class="info-card">
+                    <strong>🏙️ ${cityData.name.toUpperCase()} - ПЪЛНА ИНФОРМАЦИЯ</strong><br><br>
+                    
+                    <strong>🎯 ОСНОВНИ АТРАКЦИИ:</strong><br>
+                    ${cityData.info.mainAttractions.map(attr => `• ${attr}`).join('<br>')}<br><br>
+                    
+                    <strong>🎨 МУЗЕИ:</strong><br>
+                    ${cityData.info.museums.map(museum => `• ${museum}`).join('<br>')}<br><br>
+                    
+                    <strong>💰 ЦЕНИ:</strong><br>
+                    • Музеи: ${cityData.info.prices.museums}<br>
+                    • Транспорт: ${cityData.info.prices.transport}<br>
+                    • Хранене: ${cityData.info.prices.food}<br><br>
+                    
+                    <strong>⏱️ ПРЕПОРЪЧИТЕЛНО ВРЕМЕ:</strong> ${cityData.info.timeNeeded}<br>
+                    <strong>📅 НАЙ-ДОБЪР СЕЗОН:</strong> ${cityData.info.bestTime}<br><br>
+                    
+                    <strong>🏷️ КАТЕГОРИИ:</strong> ${cityData.categories.join(', ')}<br>
+                    <strong>💎 БЮДЖЕТ:</strong> ${getBudgetLevelText(cityData.budgetLevel)}
+                </div>
+            `;
+        }
+
+        function getBudgetLevelText(level) {
+            const levels = {
+                'budget': '💰 Бюджетен',
+                'medium': '💵 Среден', 
+                'luxury': '💎 Луксозен'
+            };
+            return levels[level] || level;
+        }
+
+        function getPersonalizedFallback() {
+            if (userProfile.lastSearches.length > 0) {
+                const lastCityName = userProfile.lastSearches[0];
+                const lastCity = Object.values(enhancedCityDatabase).find(city => city.name === lastCityName);
+                if (lastCity) {
+                    const similar = findSimilarCities(lastCity).slice(0, 2);
+                    return `
+                        <div class="tip-card">
+                            <strong>🤔 Не разбрах въпроса ви напълно.</strong><br><br>
+                            <strong>💡 Въз основа на историята ви, може да ви интересува:</strong><br>
+                            ${similar.map(city => `• ${city.name}`).join('<br>')}<br><br>
+                            Или попитайте за:<br>
+                            • <strong>Време</strong> за посещения<br>
+                            • <strong>Билети</strong> и резервации<br>
+                            • <strong>Планове</strong> за пътуване<br>
+                            • <strong>Цени</strong> за музеи
+                        </div>
+                    `;
+                }
+            }
+            
+            return currentLanguage.responses.unknown;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') sendMessage();
+        }
+        
+        function askQuestion(type) {
+            let question = '';
+            switch(type) {
+                case 'onlineTickets': question = currentLanguage.texts.onlineTickets; break;
+                case 'timeEstimate': question = currentLanguage.texts.timeEstimate; break;
+                case 'travelPlan': question = currentLanguage.texts.travelPlan; break;
+                case 'prices': question = currentLanguage.texts.prices; break;
+            }
+            document.getElementById('userInput').value = question;
+            sendMessage();
+        }
+        
         function sendMessage() {
-            const userInput = document.getElementById('userInput');
-            const message = userInput.value.trim();
-            if (message === '') return;
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            if (!message) return;
             
             addMessage(message, 'user');
-            userInput.value = '';
-            userInput.disabled = true;
+            input.value = '';
             
-            // 🎯 СИГУРНА ОБРАБОТКА БЕЗ ASYNC/AWAIT ПРОБЛЕМИ
             setTimeout(() => {
-                let response;
-                try {
-                    if (currentMode === 'novak') {
-                        response = NovakAI.обработиЗаявка(message);
-                    } else {
-                        response = ProfessionalAI.обработиЗаявка(message);
-                    }
-                    
-                    // 🎯 ПРОВЕРКА ДАЛИ response Е Promise
-                    if (response && typeof response.then === 'function') {
-                        response.then(finalResponse => {
-                            addMessage(finalResponse, currentMode === 'novak' ? 'ai' : 'pro');
-                        }).catch(error => {
-                            addMessage('❌ Възникна грешка. Моля, опитайте отново.', 'pro');
-                        }).finally(() => {
-                            userInput.disabled = false;
-                            userInput.focus();
-                        });
-                        return;
-                    }
-                    
-                    addMessage(response, currentMode === 'novak' ? 'ai' : 'pro');
-                } catch (error) {
-                    addMessage('❌ Възникна грешка. Моля, опитайте отново.', 'pro');
-                } finally {
-                    userInput.disabled = false;
-                    userInput.focus();
-                }
-            }, 500);
+                const aiResponse = getAIResponse(message);
+                addMessage(aiResponse, 'ai');
+            }, 800);
         }
-
+        
         function addMessage(text, sender) {
             const chatMessages = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}-message`;
-            messageDiv.innerHTML = text;
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `<strong>👤 Вие:</strong> ${text}`;
+            } else {
+                messageDiv.innerHTML = text;
+            }
+            
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-
-        function quickAction(action) { 
-            document.getElementById('userInput').value = action; 
-            sendMessage(); 
-        }
-
-        // ИНИЦИАЛИЗАЦИЯ
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('userInput').focus();
-        });
     </script>
 </body>
 </html>
