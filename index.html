@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel AI Assistant - Умният пътеводител</title>
+    <title>Travel AI - Универсален Пътеводител</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -54,6 +54,42 @@
         .lang-btn:hover, .lang-btn.active {
             background: rgba(255,255,255,0.3);
             color: white;
+        }
+
+        .destination-selector {
+            margin: 8px 0;
+            text-align: center;
+        }
+
+        .city-select {
+            background: rgba(255,255,255,0.9);
+            border: 2px solid rgba(139, 69, 19, 0.3);
+            border-radius: 20px;
+            padding: 6px 15px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #5D4037;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .city-select:hover {
+            border-color: #8B4513;
+            transform: translateY(-1px);
+        }
+
+        .system-message {
+            background: #E3F2FD;
+            border-left: 3px solid #2196F3;
+            text-align: center;
+            font-style: italic;
+            margin: 4px auto;
+            max-width: 80%;
+            padding: 6px 8px;
+            border-radius: 8px;
+            font-size: 10px;
         }
         
         .header h1 {
@@ -214,13 +250,18 @@
                 font-size: 10px; 
                 min-width: 50px;
             }
+            .city-select {
+                padding: 5px 12px;
+                font-size: 10px;
+                min-width: 110px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="chat-container">
         <div class="header">
-            <h1 id="header-title">🎨 ПЪТЕВОДИТЕЛ AI - ФЛОРЕНЦИЯ</h1>
+            <h1 id="header-title">🌍 УНИВЕРСАЛЕН ПЪТЕВОДИТЕЛ AI</h1>
             <p id="header-subtitle">Интелигентен помощник за вашето пътуване</p>
             
             <div class="language-switcher">
@@ -229,6 +270,14 @@
                 <div class="lang-btn" onclick="changeLanguage('it')">IT</div>
                 <div class="lang-btn" onclick="changeLanguage('es')">ES</div>
                 <div class="lang-btn" onclick="changeLanguage('fr')">FR</div>
+            </div>
+
+            <div class="destination-selector">
+                <select id="citySelect" onchange="changeDestination(this.value)" class="city-select">
+                    <option value="rome">🏛️ Рим</option>
+                    <option value="paris">🗼 Париж</option>
+                    <option value="florence">🎨 Флоренция</option>
+                </select>
             </div>
         </div>
         
@@ -263,16 +312,124 @@
     </div>
 
     <script>
-        // МУЛТИЕЗИЧНА БАЗА ДАННИ
+        const destinations = {
+            'rome': {
+                name: 'Рим',
+                icon: '🏛️',
+                country: 'Италия',
+                airportCode: 'FCO',
+                currency: 'EUR',
+                museums: [
+                    { 
+                        name: 'Колизеум', 
+                        time: '2-3 часа', 
+                        price: '16-24 €', 
+                        booking: 'coopculture.it',
+                        mustSee: true,
+                        tips: ['Резервирай онлайн избегай опашките', 'Вземи комбиниран билет с Римски форум']
+                    },
+                    { 
+                        name: 'Ватикански музеи', 
+                        time: '3-4 часа', 
+                        price: '17-27 €', 
+                        booking: 'museivaticani.va',
+                        mustSee: true,
+                        tips: ['Обиколка без водач е възможна', 'Не пропускай Сикстинската капела']
+                    }
+                ],
+                plans: {
+                    '3 дни': [
+                        '🕘 Ден 1: Колизеум, Римски форум, Палатин (8 часа)',
+                        '🕘 Ден 2: Ватикан, Замък Св. Ангел, площад Навона (7 часа)',
+                        '🕘 Ден 3: Пантеон, Фонтан ди Треви, Испанска стълба (6 часа)'
+                    ]
+                },
+                dailyBudget: '80-120 €',
+                bestTime: 'Април-Юни, Септември-Октомври',
+                transport: 'Метро (1.50 € билет), автобуси, пеша'
+            },
+            'paris': {
+                name: 'Париж',
+                icon: '🗼', 
+                country: 'Франция',
+                airportCode: 'CDG',
+                currency: 'EUR',
+                museums: [
+                    {
+                        name: 'Лувър',
+                        time: '3-5 часа',
+                        price: '17 €',
+                        booking: 'louvre.fr',
+                        mustSee: true,
+                        tips: ['Влез през мол Carrousel du Louvre', 'Фокусирай се върху Мона Лиза и Венера']
+                    },
+                    {
+                        name: 'Айфелова кула',
+                        time: '2-3 часа', 
+                        price: '10-26 €',
+                        booking: 'toureiffel.paris',
+                        mustSee: true,
+                        tips: ['Резервации отварят 60 дни предварително', 'Стъпалата са по-евтини от асансьора']
+                    }
+                ],
+                plans: {
+                    '3 дни': [
+                        '🕘 Ден 1: Айфелова кула, Лувър, Champs-Élysées (8 часа)',
+                        '🕘 Ден 2: Нотр Дам, Сент Шапел, Монмартър (7 часа)', 
+                        '🕘 Ден 3: Музей д`Орсе, Латински квартал, Сена (6 часа)'
+                    ]
+                },
+                dailyBudget: '100-150 €', 
+                bestTime: 'Март-Май, Септември-Октомври',
+                transport: 'Метро (1.90 € билет), RER, Velib` велосипеди'
+            },
+            'florence': {
+                name: 'Флоренция',
+                icon: '🎨',
+                country: 'Италия',
+                airportCode: 'FLR', 
+                currency: 'EUR',
+                museums: [
+                    {
+                        name: 'Капела Медичи',
+                        time: '1-2 часа',
+                        price: '8-20 €',
+                        booking: 'b-ticket.com',
+                        mustSee: true,
+                        tips: ['Резервирай 2-4 седмици предварително', 'Новата съкровищница е must-see']
+                    },
+                    {
+                        name: 'Галерия Уфици',
+                        time: '3-4 часа',
+                        price: '20-35 €', 
+                        booking: 'b-ticket.com',
+                        mustSee: true,
+                        tips: ['Резервации задължителни', 'Започни от залите на Ботичели']
+                    }
+                ],
+                plans: {
+                    '2 дни': [
+                        '🕘 Ден 1: Уфици, Понте Векьо, Piazza della Signoria (7 часа)',
+                        '🕘 Ден 2: Академия (Давид), Капела Медичи, Дуомо (6 часа)'
+                    ]
+                },
+                dailyBudget: '70-110 €',
+                bestTime: 'Април-Юни, Септември',
+                transport: 'Пеша (малък център), автобуси'
+            }
+        };
+
+        let currentDestination = 'rome';
+
         const translations = {
             bg: {
                 texts: {
-                    headerTitle: "🎨 ПЪТЕВОДИТЕЛ AI - ФЛОРЕНЦИЯ",
+                    headerTitle: "🌍 УНИВЕРСАЛЕН ПЪТЕВОДИТЕЛ AI",
                     headerSubtitle: "Интелигентен помощник за вашето пътуване",
-                    onlineTickets: "Онлайн резервации за Капела Медичи",
-                    timeEstimate: "Колко време отнема да видя всички музеи",
+                    onlineTickets: "Онлайн резервации",
+                    timeEstimate: "Колко време отнема да видя всички забележителности",
                     travelPlan: "Помогни ми да планирам пътуване",
-                    prices: "Цени за Флоренция",
+                    prices: "Цени и бюджет",
                     sendButton: "Изпрати",
                     placeholder: "Попитайте за време, резервации или планиране...",
                     welcomeMessage: "🤖 Здравейте!",
@@ -280,20 +437,20 @@
                 },
                 responses: {
                     timeEstimate: `<div class="info-card"><strong>⏱️ ОЦЕНКА НА ВРЕМЕТО ЗА ПОСЕЩЕНИЕ:</strong><br><strong>🎨 ОСНОВНИ МУЗЕИ:</strong><br>• Капела Медичи: <strong>1-2 часа</strong><br>• Галерия Уфици: <strong>3-4 часа</strong><br>• Академия (Давид): <strong>1-2 часа</strong><br><strong>💡 СЪВЕТ:</strong> Разпределете музеите в различни дни и започнете рано сутринта!</div>`,
-                    travelPlan: `<div class="info-card"><strong>🗓️ ПРИМЕРЕН ПЛАН ЗА 3 ДЕНЯ ВО ФЛОРЕНЦИЯ:</strong><br><strong>📅 ДЕН 1: РЕНЕСАНСОВО ИЗКУСТВО</strong><br>• 09:00 - Галерия Уфици<br>• 14:00 - Обяд в местен ресторант<br>• 16:00 - Понте Векьо<br><strong>📅 ДЕН 2: МИКЕЛАНДЖЕЛО</strong><br>• 08:30 - Академия (Давид)<br>• 11:00 - Капела Медичи<br>• 18:00 - Залез в Пиацале Микеланджело</div>`,
-                    onlineTickets: `<div class="info-card"><strong>🎫 ОНЛАЙН РЕЗЕРВАЦИИ - КАПЕЛА МЕДИЧИ</strong><br>💰 <strong>Цена:</strong> 8-20 €<br>⏰ <strong>Резервирай:</strong> 2-4 седмици предварително<br>🌐 <strong>Официален сайт:</strong> b-ticket.com<br><strong>✅ СЪВЕТИ:</strong><br>• Резервирай сутринта<br>• Избери "Cappelle Medicee"<br>• Пристигни 15 мин преди часа</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Официален сайт</button>`,
-                    prices: `<div class="info-card"><strong>💰 ЦЕНИ ЗА ФЛОРЕНЦИЯ</strong><br><strong>🎫 МУЗЕИ:</strong><br>• Капела Медичи: 8-20 €<br>• Галерия Уфици: 20-35 €<br>• Академия: 12-25 €<br><strong>🏨 ПАКЕТИ:</strong><br>• Културен (5 дни): 620 €<br>• Премиум (7 дни): 890 €</div>`,
+                    travelPlan: `<div class="info-card"><strong>🗓️ ПРИМЕРЕН ПЛАН ЗА 3 ДЕНЯ:</strong><br><strong>📅 ДЕН 1: РЕНЕСАНСОВО ИЗКУСТВО</strong><br>• 09:00 - Галерия Уфици<br>• 14:00 - Обяд в местен ресторант<br>• 16:00 - Понте Векьо<br><strong>📅 ДЕН 2: МИКЕЛАНДЖЕЛО</strong><br>• 08:30 - Академия (Давид)<br>• 11:00 - Капела Медичи<br>• 18:00 - Залез в Пиацале Микеланджело</div>`,
+                    onlineTickets: `<div class="info-card"><strong>🎫 ОНЛАЙН РЕЗЕРВАЦИИ</strong><br>💰 <strong>Цена:</strong> 8-20 €<br>⏰ <strong>Резервирай:</strong> 2-4 седмици предварително<br>🌐 <strong>Официален сайт:</strong> b-ticket.com<br><strong>✅ СЪВЕТИ:</strong><br>• Резервирай сутринта<br>• Избери "Cappelle Medicee"<br>• Пристигни 15 мин преди часа</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Официален сайт</button>`,
+                    prices: `<div class="info-card"><strong>💰 ЦЕНИ</strong><br><strong>🎫 МУЗЕИ:</strong><br>• Капела Медичи: 8-20 €<br>• Галерия Уфици: 20-35 €<br>• Академия: 12-25 €<br><strong>🏨 ПАКЕТИ:</strong><br>• Културен (5 дни): 620 €<br>• Премиум (7 дни): 890 €</div>`,
                     unknown: `<div class="tip-card"><strong>🤔 Не разбрах въпроса ви напълно.</strong><br>Моля, попитайте ме за:<br>• <strong>Време</strong> за посещения<br>• <strong>Билети</strong> и резервации<br>• <strong>Планове</strong> за пътуване<br>• <strong>Цени</strong> за музеи</div>`
                 }
             },
             en: {
                 texts: {
-                    headerTitle: "🎨 TRAVEL GUIDE AI - FLORENCE",
+                    headerTitle: "🌍 UNIVERSAL TRAVEL GUIDE AI",
                     headerSubtitle: "Your intelligent travel companion",
-                    onlineTickets: "Online tickets for Medici Chapel",
-                    timeEstimate: "How much time to see all museums",
+                    onlineTickets: "Online tickets",
+                    timeEstimate: "How much time to see all attractions",
                     travelPlan: "Help me plan my trip",
-                    prices: "Prices for Florence",
+                    prices: "Prices and budget",
                     sendButton: "Send",
                     placeholder: "Ask about time, reservations or planning...",
                     welcomeMessage: "🤖 Hello!",
@@ -301,20 +458,20 @@
                 },
                 responses: {
                     timeEstimate: `<div class="info-card"><strong>⏱️ TIME ESTIMATES FOR VISITS:</strong><br><strong>🎨 MAIN MUSEUMS:</strong><br>• Medici Chapel: <strong>1-2 hours</strong><br>• Uffizi Gallery: <strong>3-4 hours</strong><br>• Accademia (David): <strong>1-2 hours</strong><br><strong>💡 TIP:</strong> Spread museums across different days and start early morning!</div>`,
-                    travelPlan: `<div class="info-card"><strong>🗓️ SAMPLE 3-DAY FLORENCE ITINERARY:</strong><br><strong>📅 DAY 1: RENAISSANCE ART</strong><br>• 09:00 - Uffizi Gallery<br>• 14:00 - Lunch in local restaurant<br>• 16:00 - Ponte Vecchio<br><strong>📅 DAY 2: MICHELANGELO</strong><br>• 08:30 - Accademia (David)<br>• 11:00 - Medici Chapel<br>• 18:00 - Sunset at Piazzale Michelangelo</div>`,
-                    onlineTickets: `<div class="info-card"><strong>🎫 ONLINE RESERVATIONS - MEDICI CHAPEL</strong><br>💰 <strong>Price:</strong> 8-20 €<br>⏰ <strong>Book:</strong> 2-4 weeks in advance<br>🌐 <strong>Official website:</strong> b-ticket.com<br><strong>✅ TIPS:</strong><br>• Book morning slots<br>• Select "Cappelle Medicee"<br>• Arrive 15 min before your time</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Official Website</button>`,
-                    prices: `<div class="info-card"><strong>💰 FLORENCE PRICES</strong><br><strong>🎫 MUSEUMS:</strong><br>• Medici Chapel: 8-20 €<br>• Uffizi Gallery: 20-35 €<br>• Accademia: 12-25 €<br><strong>🏨 PACKAGES:</strong><br>• Cultural (5 days): 620 €<br>• Premium (7 days): 890 €</div>`,
+                    travelPlan: `<div class="info-card"><strong>🗓️ SAMPLE 3-DAY ITINERARY:</strong><br><strong>📅 DAY 1: RENAISSANCE ART</strong><br>• 09:00 - Uffizi Gallery<br>• 14:00 - Lunch in local restaurant<br>• 16:00 - Ponte Vecchio<br><strong>📅 DAY 2: MICHELANGELO</strong><br>• 08:30 - Accademia (David)<br>• 11:00 - Medici Chapel<br>• 18:00 - Sunset at Piazzale Michelangelo</div>`,
+                    onlineTickets: `<div class="info-card"><strong>🎫 ONLINE RESERVATIONS</strong><br>💰 <strong>Price:</strong> 8-20 €<br>⏰ <strong>Book:</strong> 2-4 weeks in advance<br>🌐 <strong>Official website:</strong> b-ticket.com<br><strong>✅ TIPS:</strong><br>• Book morning slots<br>• Select "Cappelle Medicee"<br>• Arrive 15 min before your time</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Official Website</button>`,
+                    prices: `<div class="info-card"><strong>💰 PRICES</strong><br><strong>🎫 MUSEUMS:</strong><br>• Medici Chapel: 8-20 €<br>• Uffizi Gallery: 20-35 €<br>• Accademia: 12-25 €<br><strong>🏨 PACKAGES:</strong><br>• Cultural (5 days): 620 €<br>• Premium (7 days): 890 €</div>`,
                     unknown: `<div class="tip-card"><strong>🤔 I didn't fully understand your question.</strong><br>Please ask me about:<br>• <strong>Time</strong> for visits<br>• <strong>Tickets</strong> and reservations<br>• <strong>Travel</strong> plans<br>• <strong>Prices</strong> for museums</div>`
                 }
             },
             it: {
                 texts: {
-                    headerTitle: "🎨 GUIDA AI - FIRENZE",
+                    headerTitle: "🌍 GUIDA DI VIAGGIO AI UNIVERSALE",
                     headerSubtitle: "Il tuo compagno di viaggio intelligente",
-                    onlineTickets: "Prenotazioni online per Cappelle Medicee",
-                    timeEstimate: "Quanto tempo per vedere tutti i musei",
+                    onlineTickets: "Prenotazioni online",
+                    timeEstimate: "Quanto tempo per vedere tutte le attrazioni",
                     travelPlan: "Aiutami a pianificare il viaggio",
-                    prices: "Prezzi per Firenze",
+                    prices: "Prezzi e budget",
                     sendButton: "Invia",
                     placeholder: "Chiedi informazioni su tempo, prenotazioni o pianificazione...",
                     welcomeMessage: "🤖 Ciao!",
@@ -322,20 +479,20 @@
                 },
                 responses: {
                     timeEstimate: `<div class="info-card"><strong>⏱️ TEMPO STIMATO PER LE VISITE:</strong><br><strong>🎨 MUSEI PRINCIPALI:</strong><br>• Cappelle Medicee: <strong>1-2 ore</strong><br>• Galleria degli Uffizi: <strong>3-4 ore</strong><br>• Accademia (David): <strong>1-2 ore</strong><br><strong>💡 CONSIGLIO:</strong> Distribuisci i musei in giorni diversi e inizia di prima mattina!</div>`,
-                    travelPlan: `<div class="info-card"><strong>🗓️ ITINERARIO DI 3 GIORNI A FIRENZE:</strong><br><strong>📅 GIORNO 1: ARTE RINASCIMENTALE</strong><br>• 09:00 - Galleria degli Uffizi<br>• 14:00 - Pranzo in ristorante locale<br>• 16:00 - Ponte Vecchio<br><strong>📅 GIORNO 2: MICHELANGELO</strong><br>• 08:30 - Accademia (David)<br>• 11:00 - Cappelle Medicee<br>• 18:00 - Tramonto al Piazzale Michelangelo</div>`,
-                    onlineTickets: `<div class="info-card"><strong>🎫 PRENOTAZIONI ONLINE - CAPPELLE MEDICEE</strong><br>💰 <strong>Prezzo:</strong> 8-20 €<br>⏰ <strong>Prenota:</strong> 2-4 settimane prima<br>🌐 <strong>Sito ufficiale:</strong> b-ticket.com<br><strong>✅ CONSIGLI:</strong><br>• Prenota gli slot mattutini<br>• Seleziona "Cappelle Medicee"<br>• Arriva 15 min prima dell'orario</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Sito Ufficiale</button>`,
-                    prices: `<div class="info-card"><strong>💰 PREZZI FIRENZE</strong><br><strong>🎫 MUSEI:</strong><br>• Cappelle Medicee: 8-20 €<br>• Galleria Uffizi: 20-35 €<br>• Accademia: 12-25 €<br><strong>🏨 PACCHETTI:</strong><br>• Culturale (5 giorni): 620 €<br>• Premium (7 giorni): 890 €</div>`,
+                    travelPlan: `<div class="info-card"><strong>🗓️ ITINERARIO DI 3 GIORNI:</strong><br><strong>📅 GIORNO 1: ARTE RINASCIMENTALE</strong><br>• 09:00 - Galleria degli Uffizi<br>• 14:00 - Pranzo in ristorante locale<br>• 16:00 - Ponte Vecchio<br><strong>📅 GIORNO 2: MICHELANGELO</strong><br>• 08:30 - Accademia (David)<br>• 11:00 - Cappelle Medicee<br>• 18:00 - Tramonto al Piazzale Michelangelo</div>`,
+                    onlineTickets: `<div class="info-card"><strong>🎫 PRENOTAZIONI ONLINE</strong><br>💰 <strong>Prezzo:</strong> 8-20 €<br>⏰ <strong>Prenota:</strong> 2-4 settimane prima<br>🌐 <strong>Sito ufficiale:</strong> b-ticket.com<br><strong>✅ CONSIGLI:</strong><br>• Prenota gli slot mattutini<br>• Seleziona "Cappelle Medicee"<br>• Arriva 15 min prima dell'orario</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Sito Ufficiale</button>`,
+                    prices: `<div class="info-card"><strong>💰 PREZZI</strong><br><strong>🎫 MUSEI:</strong><br>• Cappelle Medicee: 8-20 €<br>• Galleria Uffizi: 20-35 €<br>• Accademia: 12-25 €<br><strong>🏨 PACCHETTI:</strong><br>• Culturale (5 giorni): 620 €<br>• Premium (7 giorni): 890 €</div>`,
                     unknown: `<div class="tip-card"><strong>🤔 Non ho capito completamente la tua domanda.</strong><br>Per favore chiedimi di:<br>• <strong>Tempo</strong> per le visite<br>• <strong>Biglietti</strong> e prenotazioni<br>• <strong>Piani</strong> di viaggio<br>• <strong>Prezzi</strong> per i musei</div>`
                 }
             },
             es: {
                 texts: {
-                    headerTitle: "🎨 GUÍA AI - FLORENCIA",
+                    headerTitle: "🌍 GUÍA DE VIAJE AI UNIVERSAL",
                     headerSubtitle: "Tu compañero de viaje inteligente",
-                    onlineTickets: "Reservas online para Capilla Medici",
-                    timeEstimate: "Cuánto tiempo para ver todos los museos",
+                    onlineTickets: "Reservas online",
+                    timeEstimate: "Cuánto tiempo para ver todas las atracciones",
                     travelPlan: "Ayúdame a planificar el viaje",
-                    prices: "Precios para Florencia",
+                    prices: "Precios y presupuesto",
                     sendButton: "Enviar",
                     placeholder: "Pregunta sobre tiempo, reservas o planificación...",
                     welcomeMessage: "🤖 ¡Hola!",
@@ -343,20 +500,20 @@
                 },
                 responses: {
                     timeEstimate: `<div class="info-card"><strong>⏱️ ESTIMACIÓN DE TIEMPO PARA VISITAS:</strong><br><strong>🎨 MUSEOS PRINCIPALES:</strong><br>• Capilla Medici: <strong>1-2 horas</strong><br>• Galería Uffizi: <strong>3-4 horas</strong><br>• Academia (David): <strong>1-2 horas</strong><br><strong>💡 CONSEJO:</strong> ¡Distribuye los museos en días diferentes y comienza temprano por la mañana!</div>`,
-                    travelPlan: `<div class="info-card"><strong>🗓️ ITINERARIO DE 3 DÍAS EN FLORENCIA:</strong><br><strong>📅 DÍA 1: ARTE RENACENTISTA</strong><br>• 09:00 - Galería Uffizi<br>• 14:00 - Almuerzo en restaurante local<br>• 16:00 - Ponte Vecchio<br><strong>📅 DÍA 2: MIGUEL ÁNGEL</strong><br>• 08:30 - Academia (David)<br>• 11:00 - Capilla Medici<br>• 18:00 - Atardecer en Piazzale Michelangelo</div>`,
-                    onlineTickets: `<div class="info-card"><strong>🎫 RESERVAS ONLINE - CAPILLA MEDICI</strong><br>💰 <strong>Precio:</strong> 8-20 €<br>⏰ <strong>Reserva:</strong> 2-4 semanas antes<br>🌐 <strong>Sitio oficial:</strong> b-ticket.com<br><strong>✅ CONSEJOS:</strong><br>• Reserva horarios matutinos<br>• Selecciona "Cappelle Medicee"<br>• Llega 15 min antes de tu hora</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Sitio Oficial</button>`,
-                    prices: `<div class="info-card"><strong>💰 PRECIOS FLORENCIA</strong><br><strong>🎫 MUSEOS:</strong><br>• Capilla Medici: 8-20 €<br>• Galería Uffizi: 20-35 €<br>• Academia: 12-25 €<br><strong>🏨 PAQUETES:</strong><br>• Cultural (5 días): 620 €<br>• Premium (7 días): 890 €</div>`,
+                    travelPlan: `<div class="info-card"><strong>🗓️ ITINERARIO DE 3 DÍAS:</strong><br><strong>📅 DÍA 1: ARTE RENACENTISTA</strong><br>• 09:00 - Galería Uffizi<br>• 14:00 - Almuerzo en restaurante local<br>• 16:00 - Ponte Vecchio<br><strong>📅 DÍA 2: MIGUEL ÁNGEL</strong><br>• 08:30 - Academia (David)<br>• 11:00 - Capilla Medici<br>• 18:00 - Atardecer en Piazzale Michelangelo</div>`,
+                    onlineTickets: `<div class="info-card"><strong>🎫 RESERVAS ONLINE</strong><br>💰 <strong>Precio:</strong> 8-20 €<br>⏰ <strong>Reserva:</strong> 2-4 semanas antes<br>🌐 <strong>Sitio oficial:</strong> b-ticket.com<br><strong>✅ CONSEJOS:</strong><br>• Reserva horarios matutinos<br>• Selecciona "Cappelle Medicee"<br>• Llega 15 min antes de tu hora</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Sitio Oficial</button>`,
+                    prices: `<div class="info-card"><strong>💰 PRECIOS</strong><br><strong>🎫 MUSEOS:</strong><br>• Capilla Medici: 8-20 €<br>• Galería Uffizi: 20-35 €<br>• Academia: 12-25 €<br><strong>🏨 PAQUETES:</strong><br>• Cultural (5 días): 620 €<br>• Premium (7 días): 890 €</div>`,
                     unknown: `<div class="tip-card"><strong>🤔 No entendí completamente tu pregunta.</strong><br>Por favor pregúntame sobre:<br>• <strong>Tiempo</strong> para visitas<br>• <strong>Entradas</strong> y reservas<br>• <strong>Planes</strong> de viaje<br>• <strong>Precios</strong> para museos</div>`
                 }
             },
             fr: {
                 texts: {
-                    headerTitle: "🎨 GUIDE AI - FLORENCE",
+                    headerTitle: "🌍 GUIDE DE VOYAGE AI UNIVERSEL",
                     headerSubtitle: "Votre compagnon de voyage intelligent",
-                    onlineTickets: "Réservations en ligne pour Chapelle Medici",
-                    timeEstimate: "Temps nécessaire pour voir tous les musées",
+                    onlineTickets: "Réservations en ligne",
+                    timeEstimate: "Temps nécessaire pour voir toutes les attractions",
                     travelPlan: "Aidez-moi à planifier mon voyage",
-                    prices: "Prix pour Florence",
+                    prices: "Prix et budget",
                     sendButton: "Envoyer",
                     placeholder: "Demandez sur le temps, les réservations ou la planification...",
                     welcomeMessage: "🤖 Bonjour!",
@@ -364,179 +521,10 @@
                 },
                 responses: {
                     timeEstimate: `<div class="info-card"><strong>⏱️ ESTIMATION DU TEMPS DE VISITE:</strong><br><strong>🎨 MUSÉES PRINCIPAUX:</strong><br>• Chapelle Medici: <strong>1-2 heures</strong><br>• Galerie des Offices: <strong>3-4 heures</strong><br>• Académie (David): <strong>1-2 heures</strong><br><strong>💡 CONSEIL:</strong> Répartissez les musées sur différents jours et commencez tôt le matin!</div>`,
-                    travelPlan: `<div class="info-card"><strong>🗓️ ITINÉRAIRE DE 3 JOURS À FLORENCE:</strong><br><strong>📅 JOUR 1: ART RENAISSANCE</strong><br>• 09:00 - Galerie des Offices<br>• 14:00 - Déjeuner dans un restaurant local<br>• 16:00 - Ponte Vecchio<br><strong>📅 JOUR 2: MICHEL-ANGE</strong><br>• 08:30 - Académie (David)<br>• 11:00 - Chapelle Medici<br>• 18:00 - Coucher de soleil au Piazzale Michelangelo</div>`,
-                    onlineTickets: `<div class="info-card"><strong>🎫 RÉSERVATIONS EN LIGNE - CHAPELLE MEDICI</strong><br>💰 <strong>Prix:</strong> 8-20 €<br>⏰ <strong>Réservez:</strong> 2-4 semaines à l'avance<br>🌐 <strong>Site officiel:</strong> b-ticket.com<br><strong>✅ CONSEILS:</strong><br>• Réservez les créneaux matinaux<br>• Sélectionnez "Cappelle Medicee"<br>• Arrivez 15 min avant votre heure</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Site Officiel</button>`,
-                    prices: `<div class="info-card"><strong>💰 PRIX FLORENCE</strong><br><strong>🎫 MUSÉES:</strong><br>• Chapelle Medici: 8-20 €<br>• Galerie des Offices: 20-35 €<br>• Académie: 12-25 €<br><strong>🏨 FORFAITS:</strong><br>• Culturel (5 jours): 620 €<br>• Premium (7 jours): 890 €</div>`,
+                    travelPlan: `<div class="info-card"><strong>🗓️ ITINÉRAIRE DE 3 JOURS:</strong><br><strong>📅 JOUR 1: ART RENAISSANCE</strong><br>• 09:00 - Galerie des Offices<br>• 14:00 - Déjeuner dans un restaurant local<br>• 16:00 - Ponte Vecchio<br><strong>📅 JOUR 2: MICHEL-ANGE</strong><br>• 08:30 - Académie (David)<br>• 11:00 - Chapelle Medici<br>• 18:00 - Coucher de soleil au Piazzale Michelangelo</div>`,
+                    onlineTickets: `<div class="info-card"><strong>🎫 RÉSERVATIONS EN LIGNE</strong><br>💰 <strong>Prix:</strong> 8-20 €<br>⏰ <strong>Réservez:</strong> 2-4 semaines à l'avance<br>🌐 <strong>Site officiel:</strong> b-ticket.com<br><strong>✅ CONSEILS:</strong><br>• Réservez les créneaux matinaux<br>• Sélectionnez "Cappelle Medicee"<br>• Arrivez 15 min avant votre heure</div><button class="action-btn" onclick="window.open('https://www.b-ticket.com/b-Ticket/uffizi/', '_blank')">🎫 Site Officiel</button>`,
+                    prices: `<div class="info-card"><strong>💰 PRIX</strong><br><strong>🎫 MUSÉES:</strong><br>• Chapelle Medici: 8-20 €<br>• Galerie des Offices: 20-35 €<br>• Académie: 12-25 €<br><strong>🏨 FORFAITS:</strong><br>• Culturel (5 jours): 620 €<br>• Premium (7 jours): 890 €</div>`,
                     unknown: `<div class="tip-card"><strong>🤔 Je n'ai pas bien compris votre question.</strong><br>Veuillez me demander :<br>• <strong>Temps</strong> pour les visites<br>• <strong>Billets</strong> et réservations<br>• <strong>Plans</strong> de voyage<br>• <strong>Prix</strong> pour les musées</div>`
-                }
-            }
-        };
-
-        // ПЕРСОНАЛИЗАЦИЯ - ПЪЛНА ИМПЛЕМЕНТАЦИЯ
-        let userProfile = {
-            searchHistory: [],
-            preferences: {
-                travelType: null,
-                budget: null,
-                interests: [],
-                season: null
-            },
-            favoriteCities: [],
-            lastSearches: []
-        };
-
-        const enhancedCityDatabase = {
-            "рим": {
-                name: "Рим",
-                keywords: ["рим", "roma", "rome"],
-                categories: ["history", "culture", "romantic", "food", "architecture"],
-                tags: ["античен", "религиозен", "архитектура", "вкусна храна", "романтичен"],
-                budgetLevel: "medium",
-                bestSeasons: ["spring", "autumn"],
-                familyFriendly: true,
-                romanticScore: 9,
-                info: {
-                    mainAttractions: ["Колизеум", "Ватикан", "Пантеон", "Фонтан ди Треви"],
-                    museums: ["Ватикански музеи", "Музеи на Капитолия", "Галерия Боргезе"],
-                    prices: { museums: "15-25€", transport: "7€/дневен билет", food: "15-30€ за хранене" },
-                    timeNeeded: "4-5 дни",
-                    bestTime: "Март-Май, Септември-Октомври"
-                }
-            },
-            "париж": {
-                name: "Париж",
-                keywords: ["париж", "paris"],
-                categories: ["romantic", "culture", "shopping", "food", "art"],
-                tags: ["романтичен", "мода", "изкуство", "гастрономия", "луксозен"],
-                budgetLevel: "luxury",
-                bestSeasons: ["spring", "summer"],
-                familyFriendly: true,
-                romanticScore: 10,
-                info: {
-                    mainAttractions: ["Айфелова кула", "Лувър", "Нотр Дам", "Триумфална арка"],
-                    museums: ["Лувър", "Музей д'Орсе", "Център Помпиду"],
-                    prices: { museums: "12-25€", transport: "12€/дневен билет", food: "20-40€ за хранене" },
-                    timeNeeded: "4-5 дни",
-                    bestTime: "Април-Юни, Септември-Октомври"
-                }
-            },
-            "барселона": {
-                name: "Барселона",
-                keywords: ["барселона", "barcelona"],
-                categories: ["beach", "culture", "nightlife", "architecture", "family"],
-                tags: ["плаж", "Гауди", "нощен живот", "модернизъм", "семеен"],
-                budgetLevel: "medium",
-                bestSeasons: ["spring", "summer", "autumn"],
-                familyFriendly: true,
-                romanticScore: 7,
-                info: {
-                    mainAttractions: ["Саграда Фамилия", "Парк Гуел", "Ла Рамбла", "Готически квартал"],
-                    museums: ["Музей Пикасо", "Фондация Миро", "MNAC"],
-                    prices: { museums: "10-20€", transport: "10€/дневен билет", food: "15-30€ за хранене" },
-                    timeNeeded: "3-4 дни",
-                    bestTime: "Май-Юни, Септември"
-                }
-            },
-            "прага": {
-                name: "Прага",
-                keywords: ["прага", "prague", "praha"],
-                categories: ["history", "culture", "budget", "romantic"],
-                tags: ["исторически", "евтин", "романтичен", "архитектура"],
-                budgetLevel: "budget",
-                bestSeasons: ["spring", "autumn"],
-                familyFriendly: true,
-                romanticScore: 8,
-                info: {
-                    mainAttractions: ["Пражки замък", "Карлов мост", "Астрономически часовник", "Староместки площад"],
-                    museums: ["Национален музей", "Музей на комунизма", "Музей Кампа"],
-                    prices: { museums: "8-15€", transport: "5€/дневен билет", food: "10-20€ за хранене" },
-                    timeNeeded: "3-4 дни",
-                    bestTime: "Април-Май, Септември-Октомври"
-                }
-            },
-            "будапеща": {
-                name: "Будапеща",
-                keywords: ["будапеща", "budapest"],
-                categories: ["history", "culture", "budget", "romantic", "spa"],
-                tags: ["исторически", "евтин", "романтичен", "спа", "термални бани"],
-                budgetLevel: "budget",
-                bestSeasons: ["spring", "autumn"],
-                familyFriendly: true,
-                romanticScore: 8,
-                info: {
-                    mainAttractions: ["Парламент", "Рибарски бастион", "Будайски замък", "Цепен мост"],
-                    museums: ["Национален музей", "Музей на изкуствата", "Дом на террора"],
-                    prices: { museums: "8-15€", transport: "5€/дневен билет", food: "10-20€ за хранене" },
-                    timeNeeded: "3-4 дни",
-                    bestTime: "Април-Май, Септември-Октомври"
-                }
-            },
-            "лисабон": {
-                name: "Лисабон",
-                keywords: ["лисабон", "lisbon", "lisboa"],
-                categories: ["culture", "beach", "budget", "food", "hills"],
-                tags: ["хълмист", "евтин", "плаж", "вкусна храна", "трамваи"],
-                budgetLevel: "budget",
-                bestSeasons: ["spring", "autumn"],
-                familyFriendly: true,
-                romanticScore: 7,
-                info: {
-                    mainAttractions: ["Замък Сао Хорхе", "Беленска кула", "Монастир на Йеронимитите", "Алфама"],
-                    museums: ["Музей на карети", "Музей на изкуството", "MAAT"],
-                    prices: { museums: "8-15€", transport: "6€/дневен билет", food: "12-25€ за хранене" },
-                    timeNeeded: "3-4 дни",
-                    bestTime: "Март-Май, Септември-Октомври"
-                }
-            },
-            "ница": {
-                name: "Ница",
-                keywords: ["ница", "nice"],
-                categories: ["beach", "romantic", "luxury", "french_riviera"],
-                tags: ["плаж", "романтичен", "луксозен", "Лазурен бряг", "френска ривиера"],
-                budgetLevel: "luxury",
-                bestSeasons: ["spring", "summer"],
-                familyFriendly: true,
-                romanticScore: 9,
-                info: {
-                    mainAttractions: ["Английска набережна", "Стари град", "Замъкова хълм", "Марк Шагал музей"],
-                    museums: ["Музей на изкуствата", "МАМАК", "Музей Матис"],
-                    prices: { museums: "10-15€", transport: "5€/дневен", food: "20-40€" },
-                    timeNeeded: "2-3 дни",
-                    bestTime: "Май-Септември"
-                }
-            },
-            "венеция": {
-                name: "Венеция",
-                keywords: ["венеция", "venice", "venezia"],
-                categories: ["romantic", "culture", "unique", "canals"],
-                tags: ["романтичен", "канали", "уникален", "гондоли", "луксозен"],
-                budgetLevel: "luxury",
-                bestSeasons: ["spring", "autumn"],
-                familyFriendly: true,
-                romanticScore: 10,
-                info: {
-                    mainAttractions: ["Площад Сан Марко", "Дворец Дожете", "Мост Вздихвания", "Канали"],
-                    museums: ["Галерия Академия", "Музей на стъклото", "Пеги Гугенхайм колекция"],
-                    prices: { museums: "15-25€", transport: "20€/водно такси", food: "25-50€" },
-                    timeNeeded: "2-3 дни",
-                    bestTime: "Април-Май, Септември-Октомври"
-                }
-            },
-            "амстердам": {
-                name: "Амстердам",
-                keywords: ["амстердам", "amsterdam"],
-                categories: ["culture", "canals", "nightlife", "art", "bicycles"],
-                tags: ["канали", "велосипеди", "нощен живот", "изкуство", "толерантен"],
-                budgetLevel: "medium",
-                bestSeasons: ["spring", "summer"],
-                familyFriendly: true,
-                romanticScore: 7,
-                info: {
-                    mainAttractions: ["Канали", "Райксмузей", "Ан Франк къща", "Дам площад"],
-                    museums: ["Райксмузей", "Ван Гог музей", "Ан Франк къща"],
-                    prices: { museums: "15-25€", transport: "8€/дневен билет", food: "15-30€ за хранене" },
-                    timeNeeded: "3-4 дни",
-                    bestTime: "Април-Октомври"
                 }
             }
         };
@@ -563,463 +551,153 @@
             document.getElementById('welcome-text').textContent = currentLanguage.texts.welcomeText;
         }
 
+        function changeDestination(city) {
+            currentDestination = city;
+            const dest = destinations[city];
+            
+            document.getElementById('header-title').textContent = 
+                `${dest.icon} ПЪТЕВОДИТЕЛ AI - ${dest.name}`;
+            
+            updateSuggestions(dest);
+            
+            addSystemMessage(`📍 Сега разглеждате информация за ${dest.name}, ${dest.country}`);
+        }
+
+        function updateSuggestions(destination) {
+            const suggestionTexts = [
+                `🎫 Билети за ${destination.museums[0]?.name || 'музеи'}`,
+                `⏱️ Време за посещения`,
+                `🗓️ План за ${destination.name}`,
+                `💰 Цени за ${destination.name}`
+            ];
+            
+            const suggestionChips = document.querySelectorAll('.suggestion-chip span');
+            suggestionChips.forEach((chip, index) => {
+                chip.textContent = suggestionTexts[index] || chip.textContent;
+            });
+        }
+
+        function addSystemMessage(text) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message system-message';
+            messageDiv.innerHTML = `<em>${text}</em>`;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
         function getAIResponse(message) {
             const lowerMessage = message.toLowerCase();
+            const destination = destinations[currentDestination];
             
-            updateUserProfile(lowerMessage);
-            
-            if (lowerMessage.includes('подобни на') || lowerMessage.includes('similar to') || lowerMessage.includes('като')) {
-                return getSimilarCitiesResponse(message);
+            if (lowerMessage.includes('време') || lowerMessage.includes('time') || lowerMessage.includes('колко')) {
+                return generateTimeResponse(destination);
             }
-            
-            if (lowerMessage.includes('препоръчай') || lowerMessage.includes('recommend') || lowerMessage.includes('предложи')) {
-                return getPersonalizedRecommendations(message);
+            else if (lowerMessage.includes('план') || lowerMessage.includes('plan') || lowerMessage.includes('itiner')) {
+                return generatePlanResponse(destination);
             }
-            
-            if (lowerMessage.includes('евтино') || lowerMessage.includes('бюджет') || lowerMessage.includes('cheap') || lowerMessage.includes('икономично')) {
-                return getBudgetRecommendations();
+            else if (lowerMessage.includes('билет') || lowerMessage.includes('ticket') || lowerMessage.includes('броня')) {
+                return generateTicketsResponse(destination);
             }
-            
-            if (lowerMessage.includes('луксоз') || lowerMessage.includes('luxury') || lowerMessage.includes('скъп')) {
-                return getLuxuryRecommendations();
+            else if (lowerMessage.includes('цен') || lowerMessage.includes('price') || lowerMessage.includes('пари')) {
+                return generatePricesResponse(destination);
             }
-            
-            if (lowerMessage.includes('романтич') || lowerMessage.includes('romantic') || lowerMessage.includes('меден месец')) {
-                return getRomanticRecommendations();
+            else if (lowerMessage.includes('бюджет') || lowerMessage.includes('budget')) {
+                return generateBudgetResponse(destination);
             }
-            
-            if (lowerMessage.includes('плаж') || lowerMessage.includes('beach') || lowerMessage.includes('море')) {
-                return getBeachRecommendations();
+            else {
+                return generateUnknownResponse(destination);
             }
+        }
+
+        function generateTimeResponse(dest) {
+            let html = `<div class="info-card"><strong>⏱️ ОЦЕНКА НА ВРЕМЕТО ЗА ${dest.name.toUpperCase()}:</strong><br>`;
             
-            if (lowerMessage.includes('истори') || lowerMessage.includes('history') || lowerMessage.includes('култур')) {
-                return getCulturalRecommendations();
-            }
-            
-            if (lowerMessage.includes('лято') || lowerMessage.includes('summer')) {
-                return getSeasonalRecommendations('summer');
-            }
-            
-            if (lowerMessage.includes('зима') || lowerMessage.includes('winter')) {
-                return getSeasonalRecommendations('winter');
-            }
-            
-            if (lowerMessage.includes('пролет') || lowerMessage.includes('spring')) {
-                return getSeasonalRecommendations('spring');
-            }
-            
-            if (lowerMessage.includes('есен') || lowerMessage.includes('autumn')) {
-                return getSeasonalRecommendations('autumn');
-            }
-            
-            if (lowerMessage.includes('история') || lowerMessage.includes('history') || lowerMessage.includes('търсения')) {
-                return getSearchHistory();
-            }
-            
-            for (const [cityKey, cityData] of Object.entries(enhancedCityDatabase)) {
-                if (cityData.keywords.some(keyword => lowerMessage.includes(keyword))) {
-                    userProfile.searchHistory.push(cityData.name);
-                    userProfile.lastSearches.unshift(cityData.name);
-                    if (userProfile.lastSearches.length > 5) userProfile.lastSearches.pop();
-                    return generateCityResponse(cityData);
+            dest.museums.forEach(museum => {
+                html += `<br>• <strong>${museum.name}:</strong> ${museum.time}`;
+                if (museum.tips) {
+                    html += `<br><small>💡 ${museum.tips[0]}</small>`;
                 }
-            }
+            });
             
-            if (lowerMessage.includes('флоренция') || lowerMessage.includes('florence') || lowerMessage.includes('firenze')) {
-                if (lowerMessage.includes('време') || lowerMessage.includes('time') || lowerMessage.includes('колко')) {
-                    return currentLanguage.responses.timeEstimate;
+            html += `<br><br><strong>💡 ОБЩ СЪВЕТ:</strong> Разпределете посещенията в различни дни!`;
+            html += `</div>`;
+            
+            return html;
+        }
+
+        function generatePlanResponse(dest) {
+            let html = `<div class="info-card"><strong>🗓️ ПЛАН ЗА ${dest.name.toUpperCase()}:</strong>`;
+            
+            Object.keys(dest.plans).forEach(planDuration => {
+                html += `<br><br><strong>📅 ${planDuration}:</strong>`;
+                dest.plans[planDuration].forEach(day => {
+                    html += `<br>• ${day}`;
+                });
+            });
+            
+            html += `<br><br><strong>🌤️ Най-добро време:</strong> ${dest.bestTime}`;
+            html += `</div>`;
+            
+            return html;
+        }
+
+        function generateTicketsResponse(dest) {
+            let html = `<div class="info-card"><strong>🎫 БИЛЕТИ И РЕЗЕРВАЦИИ ЗА ${dest.name.toUpperCase()}:</strong>`;
+            
+            dest.museums.filter(m => m.booking).forEach(museum => {
+                html += `<br><br><strong>${museum.name}:</strong>`;
+                html += `<br>💰 <strong>Цена:</strong> ${museum.price}`;
+                html += `<br>🌐 <strong>Сайт:</strong> ${museum.booking}`;
+                
+                if (museum.tips && museum.tips.length > 1) {
+                    html += `<br>💡 <strong>Съвет:</strong> ${museum.tips[1] || museum.tips[0]}`;
                 }
-                else if (lowerMessage.includes('план') || lowerMessage.includes('plan')) {
-                    return currentLanguage.responses.travelPlan;
+                
+                if (museum.booking && museum.booking.includes('.')) {
+                    html += `<br><button class="action-btn" onclick="window.open('https://${museum.booking}', '_blank')">🎫 Официален сайт</button>`;
                 }
-                else if (lowerMessage.includes('билет') || lowerMessage.includes('ticket')) {
-                    return currentLanguage.responses.onlineTickets;
-                }
-                else if (lowerMessage.includes('цен') || lowerMessage.includes('price')) {
-                    return currentLanguage.responses.prices;
-                }
-                else {
-                    return generateCityResponse({
-                        name: "Флоренция",
-                        info: {
-                            mainAttractions: ["Капела Медичи", "Галерия Уфици", "Понте Векьо", "Пиацале Микеланджело"],
-                            museums: ["Галерия Уфици", "Академия", "Палацо Пити"],
-                            prices: { museums: "8-35€", transport: "5€/дневен билет", food: "15-30€ за хранене" },
-                            timeNeeded: "3-4 дни",
-                            bestTime: "Април-Май, Септември-Октомври"
-                        }
-                    });
-                }
-            }
+            });
             
-            return getPersonalizedFallback();
+            html += `</div>`;
+            return html;
         }
 
-        function updateUserProfile(message) {
-            if (message.includes('евтино') || message.includes('бюджет') || message.includes('икономично')) {
-                userProfile.preferences.budget = 'budget';
-            } else if (message.includes('луксоз') || message.includes('скъп')) {
-                userProfile.preferences.budget = 'luxury';
-            }
+        function generatePricesResponse(dest) {
+            let html = `<div class="info-card"><strong>💰 ЦЕНИ ЗА ${dest.name.toUpperCase()}:</strong>`;
             
-            if (message.includes('романтич') || message.includes('меден месец')) {
-                userProfile.preferences.travelType = 'romantic';
-            } else if (message.includes('плаж') || message.includes('море')) {
-                userProfile.preferences.travelType = 'beach';
-            } else if (message.includes('истори') || message.includes('култур')) {
-                userProfile.preferences.travelType = 'culture';
-            }
+            html += `<br><br><strong>🎫 МУЗЕИ:</strong>`;
+            dest.museums.forEach(museum => {
+                html += `<br>• ${museum.name}: ${museum.price}`;
+            });
             
-            if (message.includes('лято')) userProfile.preferences.season = 'summer';
-            if (message.includes('зима')) userProfile.preferences.season = 'winter';
-            if (message.includes('пролет')) userProfile.preferences.season = 'spring';
-            if (message.includes('есен')) userProfile.preferences.season = 'autumn';
-        }
-
-        function getSimilarCitiesResponse(message) {
-            const targetCity = findCityInMessage(message);
-            if (targetCity) {
-                const similarCities = findSimilarCities(targetCity);
-                return `
-                    <div class="info-card">
-                        <strong>🔍 ПОДОБНИ НА ${targetCity.name.toUpperCase()}:</strong><br><br>
-                        ${similarCities.map(city => `
-                            <div style="margin-bottom: 10px;">
-                                <strong>🏙️ ${city.name}</strong><br>
-                                <span style="color: #666; font-size: 10px;">${city.similarity}</span><br>
-                                <span style="font-size: 10px;">🎯 ${city.info.mainAttractions.slice(0, 2).join(', ')}</span>
-                            </div>
-                        `).join('')}
-                        <br><strong>💡 Съвет:</strong> Тези градове предлагат подобни преживявания!
-                    </div>
-                `;
-            }
-            return currentLanguage.responses.unknown;
-        }
-
-        function getPersonalizedRecommendations(message) {
-            let recommendations = [];
+            html += `<br><br><strong>💳 ДНЕВЕН БЮДЖЕТ:</strong> ${dest.dailyBudget}`;
+            html += `<br><strong>🚇 ТРАНСПОРТ:</strong> ${dest.transport}`;
+            html += `</div>`;
             
-            if (message.includes('меден месец') || message.includes('романтично')) {
-                recommendations = getRomanticCities();
-            } else if (message.includes('семейно') || message.includes('деца')) {
-                recommendations = getFamilyFriendlyCities();
-            } else if (message.includes('плаж') || message.includes('море')) {
-                recommendations = getBeachCities();
-            } else if (message.includes('истори') || message.includes('култур')) {
-                recommendations = getCulturalCities();
-            } else {
-                recommendations = getIntelligentRecommendations();
-            }
-            
-            return `
-                <div class="info-card">
-                    <strong>🎯 ПЕРСОНАЛИЗИРАНИ ПРЕПОРЪКИ:</strong><br><br>
-                    ${recommendations.slice(0, 3).map((city, index) => `
-                        <div style="margin-bottom: 12px;">
-                            <strong>${getMedal(index)} ${city.name}</strong><br>
-                            <span style="color: #666; font-size: 10px;">${city.reason}</span><br>
-                            <span style="font-size: 10px;">💰 Бюджет: ${city.info.prices.food} | ⏱️ ${city.info.timeNeeded}</span>
-                        </div>
-                    `).join('')}
-                    <br><strong>💡 Съвет:</strong> Избери град според твоите интереси и бюджет!
-                </div>
-            `;
+            return html;
         }
 
-        function getBudgetRecommendations() {
-            const budgetCities = Object.values(enhancedCityDatabase)
-                .filter(city => city.budgetLevel === 'budget')
-                .slice(0, 4);
-            
-            return `
-                <div class="info-card">
-                    <strong>💰 БЮДЖЕТНИ ГРАДОВЕ:</strong><br><br>
-                    ${budgetCities.map(city => `
-                        <div style="margin-bottom: 10px;">
-                            <strong>🏙️ ${city.name}</strong><br>
-                            <span style="font-size: 10px;">💵 Хранене: ${city.info.prices.food} | 🚌 Транспорт: ${city.info.prices.transport}</span><br>
-                            <span style="font-size: 10px;">🎯 ${city.info.mainAttractions.slice(0, 2).join(', ')}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
+        function generateBudgetResponse(dest) {
+            return `<div class="tip-card">
+                <strong>💰 БЮДЖЕТ ЗА ${dest.name}:</strong>
+                <br>• <strong>Икономичен:</strong> ${dest.dailyBudget.split('-')[0]} €/ден
+                <br>• <strong>Комфортен:</strong> ${dest.dailyBudget.split('-')[1]} €/ден
+                <br>• <strong>Транспорт:</strong> ${dest.transport}
+                <br>• <strong>Валута:</strong> ${dest.currency}
+            </div>`;
         }
 
-        function getLuxuryRecommendations() {
-            const luxuryCities = Object.values(enhancedCityDatabase)
-                .filter(city => city.budgetLevel === 'luxury')
-                .slice(0, 4);
-            
-            return `
-                <div class="info-card">
-                    <strong>💎 ЛУКСОЗНИ ГРАДОВЕ:</strong><br><br>
-                    ${luxuryCities.map(city => `
-                        <div style="margin-bottom: 10px;">
-                            <strong>🏙️ ${city.name}</strong><br>
-                            <span style="font-size: 10px;">💵 Хранене: ${city.info.prices.food} | 🚖 Транспорт: ${city.info.prices.transport}</span><br>
-                            <span style="font-size: 10px;">🎯 ${city.info.mainAttractions.slice(0, 2).join(', ')}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function getRomanticRecommendations() {
-            const romanticCities = Object.values(enhancedCityDatabase)
-                .filter(city => city.categories.includes('romantic'))
-                .sort((a, b) => b.romanticScore - a.romanticScore)
-                .slice(0, 4);
-            
-            return `
-                <div class="info-card">
-                    <strong>💖 РОМАНТИЧНИ ГРАДОВЕ:</strong><br><br>
-                    ${romanticCities.map(city => `
-                        <div style="margin-bottom: 10px;">
-                            <strong>🏙️ ${city.name}</strong><br>
-                            <span style="font-size: 10px;">❤️ Романтичен рейтинг: ${city.romanticScore}/10</span><br>
-                            <span style="font-size: 10px;">🎯 ${city.info.mainAttractions.slice(0, 2).join(', ')}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function getBeachRecommendations() {
-            const beachCities = Object.values(enhancedCityDatabase)
-                .filter(city => city.categories.includes('beach'))
-                .slice(0, 4);
-            
-            return `
-                <div class="info-card">
-                    <strong>🏖️ ПЛАЖНИ ГРАДОВЕ:</strong><br><br>
-                    ${beachCities.map(city => `
-                        <div style="margin-bottom: 10px;">
-                            <strong>🏙️ ${city.name}</strong><br>
-                            <span style="font-size: 10px;">🌊 Плажна дестинация</span><br>
-                            <span style="font-size: 10px;">🎯 ${city.info.mainAttractions.slice(0, 2).join(', ')}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function getCulturalRecommendations() {
-            const culturalCities = Object.values(enhancedCityDatabase)
-                .filter(city => city.categories.includes('culture') || city.categories.includes('history'))
-                .slice(0, 4);
-            
-            return `
-                <div class="info-card">
-                    <strong>🎨 КУЛТУРНИ ГРАДОВЕ:</strong><br><br>
-                    ${culturalCities.map(city => `
-                        <div style="margin-bottom: 10px;">
-                            <strong>🏙️ ${city.name}</strong><br>
-                            <span style="font-size: 10px;">🏛️ Културно наследство</span><br>
-                            <span style="font-size: 10px;">🎯 ${city.info.mainAttractions.slice(0, 2).join(', ')}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function getSeasonalRecommendations(season) {
-            const seasonalCities = Object.values(enhancedCityDatabase)
-                .filter(city => city.bestSeasons.includes(season))
-                .slice(0, 4);
-            
-            const seasonNames = {
-                'summer': 'лято',
-                'winter': 'зима', 
-                'spring': 'пролет',
-                'autumn': 'есен'
-            };
-            
-            return `
-                <div class="info-card">
-                    <strong>🌤️ ГРАДОВЕ ЗА ${seasonNames[season].toUpperCase()}:</strong><br><br>
-                    ${seasonalCities.map(city => `
-                        <div style="margin-bottom: 10px;">
-                            <strong>🏙️ ${city.name}</strong><br>
-                            <span style="font-size: 10px;">📅 Идеален сезон: ${city.info.bestTime}</span><br>
-                            <span style="font-size: 10px;">🎯 ${city.info.mainAttractions.slice(0, 2).join(', ')}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function findCityInMessage(message) {
-            for (const [cityKey, cityData] of Object.entries(enhancedCityDatabase)) {
-                if (cityData.keywords.some(keyword => message.includes(keyword))) {
-                    return cityData;
-                }
-            }
-            return null;
-        }
-
-        function findSimilarCities(targetCity) {
-            return Object.values(enhancedCityDatabase)
-                .filter(city => city.name !== targetCity.name)
-                .map(city => {
-                    const commonCategories = city.categories.filter(cat => 
-                        targetCity.categories.includes(cat)
-                    ).length;
-                    const similarity = `${commonCategories} общи категории`;
-                    return { ...city, similarity };
-                })
-                .sort((a, b) => {
-                    const aCommon = a.categories.filter(cat => targetCity.categories.includes(cat)).length;
-                    const bCommon = b.categories.filter(cat => targetCity.categories.includes(cat)).length;
-                    return bCommon - aCommon;
-                })
-                .slice(0, 3);
-        }
-
-        function getRomanticCities() {
-            return Object.values(enhancedCityDatabase)
-                .filter(city => city.categories.includes('romantic'))
-                .sort((a, b) => b.romanticScore - a.romanticScore)
-                .slice(0, 3)
-                .map(city => ({
-                    ...city,
-                    reason: `Романтичен рейтинг: ${city.romanticScore}/10 - идеален за двойки`
-                }));
-        }
-
-        function getBeachCities() {
-            return Object.values(enhancedCityDatabase)
-                .filter(city => city.categories.includes('beach'))
-                .slice(0, 3)
-                .map(city => ({
-                    ...city,
-                    reason: `Плажна дестинация - перфектна за релакс и слънце`
-                }));
-        }
-
-        function getCulturalCities() {
-            return Object.values(enhancedCityDatabase)
-                .filter(city => city.categories.includes('culture') || city.categories.includes('history'))
-                .slice(0, 3)
-                .map(city => ({
-                    ...city,
-                    reason: `Богато културно наследство - музеи и исторически паметници`
-                }));
-        }
-
-        function getFamilyFriendlyCities() {
-            return Object.values(enhancedCityDatabase)
-                .filter(city => city.familyFriendly)
-                .slice(0, 3)
-                .map(city => ({
-                    ...city,
-                    reason: `Семейно приятелски - подходящ за деца и родители`
-                }));
-        }
-
-        function getIntelligentRecommendations() {
-            let cities = Object.values(enhancedCityDatabase);
-            
-            if (userProfile.preferences.budget) {
-                cities = cities.filter(city => city.budgetLevel === userProfile.preferences.budget);
-            }
-            
-            if (userProfile.preferences.travelType === 'romantic') {
-                cities = cities.filter(city => city.categories.includes('romantic'))
-                             .sort((a, b) => b.romanticScore - a.romanticScore);
-            }
-            
-            if (userProfile.lastSearches.length > 0) {
-                const lastCityName = userProfile.lastSearches[0];
-                const lastCity = cities.find(city => city.name === lastCityName);
-                if (lastCity) {
-                    cities = findSimilarCities(lastCity);
-                }
-            }
-            
-            return cities.slice(0, 3).map(city => ({
-                ...city,
-                reason: `Препоръчано въз основа на вашите предпочитания`
-            }));
-        }
-
-        function getMedal(index) {
-            const medals = ["🥇", "🥈", "🥉"];
-            return medals[index] || "⭐";
-        }
-
-        function getSearchHistory() {
-            if (userProfile.lastSearches.length === 0) {
-                return `<div class="tip-card"><strong>📊 Все още нямате история на търсенията.</strong><br>Започнете да търсите градове!</div>`;
-            }
-            
-            return `
-                <div class="info-card">
-                    <strong>📊 ИСТОРИЯ НА ТЪРСЕНЕТА:</strong><br><br>
-                    ${userProfile.lastSearches.map((city, index) => `
-                        <strong>${index + 1}. ${city}</strong>
-                    `).join('<br>')}
-                    <br><br><strong>💡 Съвет:</strong> Питай "подобни на [град]" за свързани препоръки!
-                </div>
-            `;
-        }
-
-        function generateCityResponse(cityData) {
-            return `
-                <div class="info-card">
-                    <strong>🏙️ ${cityData.name.toUpperCase()} - ПЪЛНА ИНФОРМАЦИЯ</strong><br><br>
-                    
-                    <strong>🎯 ОСНОВНИ АТРАКЦИИ:</strong><br>
-                    ${cityData.info.mainAttractions.map(attr => `• ${attr}`).join('<br>')}<br><br>
-                    
-                    <strong>🎨 МУЗЕИ:</strong><br>
-                    ${cityData.info.museums.map(museum => `• ${museum}`).join('<br>')}<br><br>
-                    
-                    <strong>💰 ЦЕНИ:</strong><br>
-                    • Музеи: ${cityData.info.prices.museums}<br>
-                    • Транспорт: ${cityData.info.prices.transport}<br>
-                    • Хранене: ${cityData.info.prices.food}<br><br>
-                    
-                    <strong>⏱️ ПРЕПОРЪЧИТЕЛНО ВРЕМЕ:</strong> ${cityData.info.timeNeeded}<br>
-                    <strong>📅 НАЙ-ДОБЪР СЕЗОН:</strong> ${cityData.info.bestTime}<br><br>
-                    
-                    <strong>🏷️ КАТЕГОРИИ:</strong> ${cityData.categories.join(', ')}<br>
-                    <strong>💎 БЮДЖЕТ:</strong> ${getBudgetLevelText(cityData.budgetLevel)}
-                </div>
-            `;
-        }
-
-        function getBudgetLevelText(level) {
-            const levels = {
-                'budget': '💰 Бюджетен',
-                'medium': '💵 Среден', 
-                'luxury': '💎 Луксозен'
-            };
-            return levels[level] || level;
-        }
-
-        function getPersonalizedFallback() {
-            if (userProfile.lastSearches.length > 0) {
-                const lastCityName = userProfile.lastSearches[0];
-                const lastCity = Object.values(enhancedCityDatabase).find(city => city.name === lastCityName);
-                if (lastCity) {
-                    const similar = findSimilarCities(lastCity).slice(0, 2);
-                    return `
-                        <div class="tip-card">
-                            <strong>🤔 Не разбрах въпроса ви напълно.</strong><br><br>
-                            <strong>💡 Въз основа на историята ви, може да ви интересува:</strong><br>
-                            ${similar.map(city => `• ${city.name}`).join('<br>')}<br><br>
-                            Или попитайте за:<br>
-                            • <strong>Време</strong> за посещения<br>
-                            • <strong>Билети</strong> и резервации<br>
-                            • <strong>Планове</strong> за пътуване<br>
-                            • <strong>Цени</strong> за музеи
-                        </div>
-                    `;
-                }
-            }
-            
-            return currentLanguage.responses.unknown;
+        function generateUnknownResponse(dest) {
+            return `<div class="tip-card">
+                <strong>🤔 Не разбрах въпроса ви за ${dest.name}.</strong>
+                <br>Моля, попитайте ме за:
+                <br>• <strong>Време</strong> за посещения
+                <br>• <strong>Билети</strong> и резервации  
+                <br>• <strong>Планове</strong> за пътуване
+                <br>• <strong>Цени</strong> и бюджет
+                <br>• <strong>Транспорт</strong> в града
+            </div>`;
         }
 
         function handleKeyPress(event) {
@@ -1027,13 +705,24 @@
         }
         
         function askQuestion(type) {
+            const dest = destinations[currentDestination];
             let question = '';
+            
             switch(type) {
-                case 'onlineTickets': question = currentLanguage.texts.onlineTickets; break;
-                case 'timeEstimate': question = currentLanguage.texts.timeEstimate; break;
-                case 'travelPlan': question = currentLanguage.texts.travelPlan; break;
-                case 'prices': question = currentLanguage.texts.prices; break;
+                case 'onlineTickets': 
+                    question = `Билети за ${dest.museums[0]?.name || 'музеи'} в ${dest.name}`; 
+                    break;
+                case 'timeEstimate': 
+                    question = 'Колко време отнема да видя всички забележителности'; 
+                    break;
+                case 'travelPlan': 
+                    question = `План за пътуване до ${dest.name}`; 
+                    break;
+                case 'prices': 
+                    question = `Цени и бюджет за ${dest.name}`; 
+                    break;
             }
+            
             document.getElementById('userInput').value = question;
             sendMessage();
         }
