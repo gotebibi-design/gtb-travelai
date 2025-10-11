@@ -297,6 +297,9 @@
             <div class="suggestion-chip" onclick="askQuestion('flights')">
                 <span>✈️ Полетни</span>
             </div>
+            <div class="suggestion-chip" onclick="askQuestion('hotels')">
+                <span>🏨 Хотели</span>
+            </div>
         </div>
         
         <div class="chat-messages" id="chatMessages">
@@ -349,7 +352,28 @@
                 },
                 dailyBudget: '80-120 €',
                 bestTime: 'Април-Юни, Септември-Октомври',
-                transport: 'Метро (1.50 € билет), автобуси, пеша'
+                transport: 'Метро (1.50 € билет), автобуси, пеша',
+                hotels: [
+                    {
+                        name: 'Hotel Colosseum',
+                        price: '80-120 €/нощувка',
+                        rating: '4.2/5',
+                        location: 'близо до Колизеума',
+                        features: ['Безплатен WiFi', 'Закуска', 'Близо до метро']
+                    },
+                    {
+                        name: 'Vatican View B&B',
+                        price: '60-90 €/нощувка',
+                        rating: '4.5/5',
+                        location: 'близо до Ватикана',
+                        features: ['Включена закуска', 'Тераса', 'Пеша до забележителностите']
+                    }
+                ],
+                weather: {
+                    'Февруари': '🌤️ 8-13°C - Хладни дни, подходящи за разходки',
+                    'Март': '🌤️ 10-16°C - Приятно време за посещения',
+                    'Април': '🌞 12-20°C - Идеално за туризъм'
+                }
             },
             'paris': {
                 name: 'Париж',
@@ -384,7 +408,28 @@
                 },
                 dailyBudget: '100-150 €', 
                 bestTime: 'Март-Май, Септември-Октомври',
-                transport: 'Метро (1.90 € билет), RER, Velib` велосипеди'
+                transport: 'Метро (1.90 € билет), RER, Velib` велосипеди',
+                hotels: [
+                    {
+                        name: 'Eiffel Tower View Hotel',
+                        price: '120-180 €/нощувка',
+                        rating: '4.3/5',
+                        location: 'близо до Айфеловата кула',
+                        features: ['Изглед към кулата', 'Луксозни стаи', 'Метро на 5 минути']
+                    },
+                    {
+                        name: 'Montmartre B&B',
+                        price: '70-110 €/нощувка',
+                        rating: '4.6/5',
+                        location: 'в сърцето на Монмартър',
+                        features: ['Автентична атмосфера', 'Включена закуска', 'Художествени галерии наоколо']
+                    }
+                ],
+                weather: {
+                    'Февруари': '🌧️ 3-8°C - Студено, често вали',
+                    'Март': '🌤️ 5-12°C - Прохладно, подходящо за музеи',
+                    'Април': '🌞 8-16°C - Приятно за разходки'
+                }
             },
             'florence': {
                 name: 'Флоренция',
@@ -418,7 +463,28 @@
                 },
                 dailyBudget: '70-110 €',
                 bestTime: 'Април-Юни, Септември',
-                transport: 'Пеша (малък център), автобуси'
+                transport: 'Пеша (малък център), автобуси',
+                hotels: [
+                    {
+                        name: 'Duomo View Hotel',
+                        price: '90-140 €/нощувка',
+                        rating: '4.4/5',
+                        location: 'на площада пред Дуомо',
+                        features: ['Изглед към катедралата', 'Традиционна архитектура', 'Централно местоположение']
+                    },
+                    {
+                        name: 'Arno River B&B',
+                        price: '65-95 €/нощувка',
+                        rating: '4.7/5',
+                        location: 'до река Арно',
+                        features: ['Романтична атмосфера', 'Включена закуска', 'Пеша до всички забележителности']
+                    }
+                ],
+                weather: {
+                    'Февруари': '🌤️ 5-12°C - Приятно за посещения в закрити',
+                    'Март': '🌞 8-16°C - Идеално за разходки',
+                    'Април': '🌞 12-20°C - Перфектно за открити пространства'
+                }
             }
         };
 
@@ -572,7 +638,8 @@
                 `⏱️ Време за посещения`,
                 `🗓️ План за ${destination.name}`,
                 `💰 Цени за ${destination.name}`,
-                `✈️ Полетни билети`
+                `✈️ Полетни билети`,
+                `🏨 Хотели в ${destination.name}`
             ];
             
             const suggestionChips = document.querySelectorAll('.suggestion-chip span');
@@ -601,7 +668,14 @@
                 lowerMessage.includes('самолетни') || lowerMessage.includes('лети')) {
                 return generateFlightsResponse(destination);
             }
-            else if (lowerMessage.includes('време') || lowerMessage.includes('time') || lowerMessage.includes('колко')) {
+            else if (lowerMessage.includes('хотел') || lowerMessage.includes('hotel') || 
+                     lowerMessage.includes('настаняване') || lowerMessage.includes('нощувк') ||
+                     lowerMessage.includes('accommodation') || lowerMessage.includes('stay')) {
+                return generateHotelsResponse(destination);
+            }
+            else if (lowerMessage.includes('време') || lowerMessage.includes('time') || 
+                     lowerMessage.includes('колко') || lowerMessage.includes('weather') ||
+                     lowerMessage.includes('метео') || lowerMessage.includes('климат')) {
                 return generateTimeResponse(destination);
             }
             else if (lowerMessage.includes('план') || lowerMessage.includes('plan') || lowerMessage.includes('itiner')) {
@@ -610,11 +684,9 @@
             else if (lowerMessage.includes('билет') || lowerMessage.includes('ticket') || lowerMessage.includes('броня')) {
                 return generateTicketsResponse(destination);
             }
-            else if (lowerMessage.includes('цен') || lowerMessage.includes('price') || lowerMessage.includes('пари')) {
+            else if (lowerMessage.includes('цен') || lowerMessage.includes('price') || lowerMessage.includes('пари') ||
+                     lowerMessage.includes('бюджет') || lowerMessage.includes('budget')) {
                 return generatePricesResponse(destination);
-            }
-            else if (lowerMessage.includes('бюджет') || lowerMessage.includes('budget')) {
-                return generateBudgetResponse(destination);
             }
             else {
                 return generateUnknownResponse(destination);
@@ -641,19 +713,49 @@
             </div>`;
         }
 
-        function generateTimeResponse(dest) {
-            let html = `<div class="info-card"><strong>⏱️ ОЦЕНКА НА ВРЕМЕТО ЗА ${dest.name.toUpperCase()}:</strong><br>`;
+        function generateHotelsResponse(dest) {
+            let html = `<div class="info-card"><strong>🏨 ХОТЕЛИ В ${dest.name.toUpperCase()}</strong>`;
             
-            dest.museums.forEach(museum => {
-                html += `<br>• <strong>${museum.name}:</strong> ${museum.time}`;
-                if (museum.tips) {
-                    html += `<br><small>💡 ${museum.tips[0]}</small>`;
-                }
+            dest.hotels.forEach(hotel => {
+                html += `<br><br><strong>${hotel.name}</strong>`;
+                html += `<br>💰 <strong>Цена:</strong> ${hotel.price}`;
+                html += `<br>⭐ <strong>Рейтинг:</strong> ${hotel.rating}`;
+                html += `<br>📍 <strong>Локация:</strong> ${hotel.location}`;
+                html += `<br>✅ <strong>Услуги:</strong> ${hotel.features.join(', ')}`;
             });
             
-            html += `<br><br><strong>💡 ОБЩ СЪВЕТ:</strong> Разпределете посещенията в различни дни!`;
-            html += `</div>`;
+            html += `<br><br><strong>💡 СЪВЕТИ ЗА РЕЗЕРВАЦИЯ:</strong>`;
+            html += `<br>• Резервирай 2-3 месеца предварително за най-добри цени`;
+            html += `<br>• Провери безплатни условия за анулация`;
+            html += `<br>• Прочети ревюта от други пътници`;
             
+            html += `<br><br><strong>🌐 ТЪРСИ ХОТЕЛИ:</strong>`;
+            html += `<button class="action-btn" onclick="window.open('https://www.booking.com', '_blank')">🏨 Booking.com</button>`;
+            html += `<button class="action-btn" onclick="window.open('https://www.airbnb.com', '_blank')">🏠 Airbnb</button>`;
+            
+            html += `</div>`;
+            return html;
+        }
+
+        function generateTimeResponse(dest) {
+            let html = `<div class="info-card"><strong>⏱️ ОЦЕНКА НА ВРЕМЕТО И КЛИМАТА В ${dest.name.toUpperCase()}:</strong>`;
+            
+            html += `<br><br><strong>🎯 ВРЕМЕ ЗА ПОСЕЩЕНИЯ:</strong>`;
+            dest.museums.forEach(museum => {
+                html += `<br>• <strong>${museum.name}:</strong> ${museum.time}`;
+            });
+            
+            html += `<br><br><strong>🌤️ СЕЗОНЕН КЛИМАТ:</strong>`;
+            Object.keys(dest.weather).forEach(month => {
+                html += `<br>• <strong>${month}:</strong> ${dest.weather[month]}`;
+            });
+            
+            html += `<br><br><strong>💡 ОБЩИ СЪВЕТИ:</strong>`;
+            html += `<br>• Разпределете посещенията в различни дни`;
+            html += `<br>• Започнете рано сутринта, за да избегнете тълпите`;
+            html += `<br>• Проверете времето преди пътуване`;
+            
+            html += `</div>`;
             return html;
         }
 
@@ -667,7 +769,8 @@
                 });
             });
             
-            html += `<br><br><strong>🌤️ Най-добро време:</strong> ${dest.bestTime}`;
+            html += `<br><br><strong>🌤️ Най-добро време за посещение:</strong> ${dest.bestTime}`;
+            html += `<br><strong>💰 Препоръчителен бюджет:</strong> ${dest.dailyBudget}`;
             html += `</div>`;
             
             return html;
@@ -695,40 +798,42 @@
         }
 
         function generatePricesResponse(dest) {
-            let html = `<div class="info-card"><strong>💰 ЦЕНИ ЗА ${dest.name.toUpperCase()}:</strong>`;
+            let html = `<div class="info-card"><strong>💰 ЦЕНИ И БЮДЖЕТ ЗА ${dest.name.toUpperCase()}:</strong>`;
             
-            html += `<br><br><strong>🎫 МУЗЕИ:</strong>`;
+            html += `<br><br><strong>🎫 МУЗЕИ И АТРАКЦИИ:</strong>`;
             dest.museums.forEach(museum => {
                 html += `<br>• ${museum.name}: ${museum.price}`;
             });
             
-            html += `<br><br><strong>💳 ДНЕВЕН БЮДЖЕТ:</strong> ${dest.dailyBudget}`;
-            html += `<br><strong>🚇 ТРАНСПОРТ:</strong> ${dest.transport}`;
-            html += `</div>`;
+            html += `<br><br><strong>🏨 НАСТАНЯВАНЕ:</strong>`;
+            dest.hotels.forEach(hotel => {
+                html += `<br>• ${hotel.name}: ${hotel.price}`;
+            });
             
+            html += `<br><br><strong>💳 ПРЕПОРЪЧИТЕЛЕН ДНЕВЕН БЮДЖЕТ:</strong> ${dest.dailyBudget}`;
+            html += `<br><strong>🚇 ТРАНСПОРТ:</strong> ${dest.transport}`;
+            html += `<br><strong>💶 ВАЛУТА:</strong> ${dest.currency}`;
+            
+            html += `<br><br><strong>💡 БЮДЖЕТЕН СЪВЕТ:</strong>`;
+            html += `<br>• Резервирай всичко онлайн предварително`;
+            html += `<br>• Пътувай извън пиковия сезон`;
+            html += `<br>• Използвай градски транспорт вместо таксита`;
+            
+            html += `</div>`;
             return html;
-        }
-
-        function generateBudgetResponse(dest) {
-            return `<div class="tip-card">
-                <strong>💰 БЮДЖЕТ ЗА ${dest.name}:</strong>
-                <br>• <strong>Икономичен:</strong> ${dest.dailyBudget.split('-')[0]} €/ден
-                <br>• <strong>Комфортен:</strong> ${dest.dailyBudget.split('-')[1]} €/ден
-                <br>• <strong>Транспорт:</strong> ${dest.transport}
-                <br>• <strong>Валута:</strong> ${dest.currency}
-            </div>`;
         }
 
         function generateUnknownResponse(dest) {
             return `<div class="tip-card">
                 <strong>🤔 Не разбрах въпроса ви за ${dest.name}.</strong>
                 <br>Моля, попитайте ме за:
-                <br>• <strong>Време</strong> за посещения
-                <br>• <strong>Билети</strong> и резервации  
+                <br>• <strong>Време</strong> за посещения и климат
+                <br>• <strong>Билети</strong> и резервации за музеи  
                 <br>• <strong>Планове</strong> за пътуване
                 <br>• <strong>Цени</strong> и бюджет
-                <br>• <strong>Транспорт</strong> в града
+                <br>• <strong>Хотели</strong> и настаняване
                 <br>• <strong>Полетни билети</strong> от София
+                <br>• <strong>Транспорт</strong> в града
             </div>`;
         }
 
@@ -755,6 +860,9 @@
                     break;
                 case 'flights': 
                     question = `Самолетни билети София - ${dest.name}`; 
+                    break;
+                case 'hotels': 
+                    question = `Хотели и настаняване в ${dest.name}`; 
                     break;
             }
             
